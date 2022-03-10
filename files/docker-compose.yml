@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  pdnssoc:
+    image: pdnssoc
+    ports:
+      - "5141:5141"
+      - "5555:5555"
+    volumes:
+      - ./td-agent.conf:/etc/td-agent/td-agent.conf
+      - ./notification_email.html:/etc/pdnssoc/notification_email.html
+      - ./code/:/usr/local/bin/
+      - ./pdnssoc.conf:/etc/pdnssoc/pdnssoc.conf
+      - ./crontab:/etc/crontab
+      - ./pdnssoc.cron:/etc/pdnssoc/pdnssoc.cron
+      - ./logs:/var/log/td-agent/
+    restart: on-failure
