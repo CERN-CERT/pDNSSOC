@@ -67,7 +67,7 @@ Alert((Alert)) --> participants
 
 * Storage solution
 
-    DNS data is ingested from passive DNS sensors. This is where the connection between originating DNS recursive client and participating institution entity is stored so that alerting is possible.
+    DNS data is ingested from passive DNS sensors. This is where the relarion between originating DNS recursive client and participating institution entity is stored so that alerting is possible.
 
 ## Areas of work - `WIP`
 
@@ -76,6 +76,7 @@ Alert((Alert)) --> participants
 - [ ] Define time window for valid MISP attributes
 - [ ] Define types of MISP attributes
 - [ ] Define different types of DNS logs (DNS Ttraffic above the recursive, passive DNS aggregated logs)
+- [ ] Define data flow for pDNS data and Incident response related data
 
 
 ## Timeline - `WIP`

@@ -5,29 +5,23 @@
 # Introduction
 
 The pDNSSOC project is aimed at organisations, e-infrastructures and federations, interested in leveraging threat intelligence to prevent, detect or investigate malicious connections.
-It focuses on providing a minimalistic design and modular deployment. 
+It focuses on providing a minimalistic design and modular deployment.
 It correlates Passive DNS (pDNS) data with network-based indicators provided by a connected [MISP](https://www.misp-project.org) instance.
 
 A key goal of pDNSSOC is to allow easy adoption by all service providers, regardless of their maturity level and security effort available.
 
 # Service components
 
-## 1. pDNS sources
+## 1. pDNS sensor
 
-This logic components includes all technologies and techniques that can produce pDNS information.
-pDNS data can either be produced by a DNS server, or by monitoring DNS traffic on a network link.
+This element provides passiveDNS data to the [Correlation Engine](./docs/correlation_engine.md). It is deployed either directly on a DNS server or on a network link. In the context of pDNSSOC, service providers will be called to deploy this sensor in their infrastracture.
 
-In the context of pDNSSOC, service providers can use many technologies, including:
-* [passivedns](https://github.com/gamelinux/passivedns/)
-* [DNSMonster](https://github.com/mosajjal/dnsmonster) :ballot_box_with_check: Recommended implementation
-* [gopassivedns](https://github.com/Phillipmartin/gopassivedns) - :warning: Unmaintained :warning: 
+pDNS sensor details and investigation can be found [here](./docs/passivedns_sensor.md).
 
-
-Ultimately, pDNS sources will produce pDNS logs, which will be sent to the Correlation Engine using XXXX.
 
 ## 2. Correlation Engine
 
-The [Correlation Engine](./docs/correlation_engine.md). is the main software component of the pDNSSOC architecture.
+The [Correlation Engine](./docs/correlation_engine.md) is the main software component of the pDNSSOC architecture.
 Its design is simple.
 
 Inputs:
@@ -38,15 +32,15 @@ Outputs:
 - **Alerts** sent to pre-defined recipient(s) (supported formats: JSON, email)
 
 Multiple [Correlation Engines](./docs/correlation_engine.md). may be deployed to cover many pDNS sources (scale-out model).
-The [Correlation Engine](./docs/correlation_engine.md). is aimed at being standalone and easily deployable.
+The [Correlation Engine](./docs/correlation_engine.md) is aimed at being standalone and easily deployable.
 
-## 3. Alerts management 
+## 3. Alerts management
 
 This component represents a human layer receiving the alerts from the Correlation Engine.
 The intent is to provide the analyst(s) with as much contextual information possible to allow them to follow up as appropriate with the originating pDNS source.
 
 Alerts may be sent to a simple email address or ingested by a complex SIEM, based on the chosen deployment model.
-Different [Correlation Engines](./docs/correlation_engine.md) can send alerts to the same recipients. 
+Different [Correlation Engines](./docs/correlation_engine.md) can send alerts to the same recipients.
 
 # Deployment options
 
