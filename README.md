@@ -25,11 +25,12 @@ The [Correlation Engine](./docs/correlation_engine.md) is the main software comp
 Its design is simple.
 
 Inputs:
--  **pDNS data**
--  **Network-based indicators** from a connected MISP instance
+*  **pDNS data**
+*  **Network-based indicators** from a connected MISP instance
 
 Outputs:
-- **Alerts** sent to pre-defined recipient(s) (supported formats: JSON, email)
+* **Alerts** sent to pre-defined recipient(s) (supported formats: JSON, email)
+* **pDNS data** forwarded to other projects relying on pDNS analysis (Opt-in). 
 
 Multiple [Correlation Engines](./docs/correlation_engine.md). may be deployed to cover many pDNS sources (scale-out model).
 The [Correlation Engine](./docs/correlation_engine.md) is aimed at being standalone and easily deployable.
@@ -48,6 +49,6 @@ Different [Correlation Engines](./docs/correlation_engine.md) can send alerts to
 
 # References
 
-https://securityintelligence.com/how-to-use-passive-dns-to-inform-your-incident-response/
+* https://securityintelligence.com/how-to-use-passive-dns-to-inform-your-incident-response/
 
-https://www.covert.io/research-papers/security/Exposure%20-%20Finding%20malicious%20domains%20using%20passive%20dns%20analysis.pdf
+* https://www.covert.io/research-papers/security/Exposure%20-%20Finding%20malicious%20domains%20using%20passive%20dns%20analysis.pdf
