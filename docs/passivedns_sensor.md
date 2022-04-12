@@ -3,8 +3,11 @@
 We are currently investigating available open source pDNS sensor solutions to integrate with pDNSSOC. There is a variety of implementations, among them:
 
 * [passivedns](https://github.com/gamelinux/passivedns/)
-* [DNSMonster](https://github.com/mosajjal/dnsmonster) :ballot_box_with_check: Recommended implementation so far
+* [DNSMonster](https://github.com/mosajjal/dnsmonster)
 * [gopassivedns](https://github.com/Phillipmartin/gopassivedns) - :warning: Unmaintained :warning:
+* [Farsight SIE DNS Sensor](https://github.com/farsightsec/sie-dns-sensor/)
+* pDNS(DNS?) data from Bro/Zeek
+* DNS logs directly above the recursive (Still not including specific client device information)
 
 ## Sensor deployment
 
