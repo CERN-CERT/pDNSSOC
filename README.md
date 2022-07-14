@@ -48,10 +48,10 @@ style Log_Ingestion stroke:#333,fill:grey,color:white,stroke-width:4px
 style alerts stroke:#333,fill:grey,color:white,stroke-width:4px
 style logformat fill:grey,color:white,stroke:#333,stroke-width:4px,stroke-dasharray: 5 5
 
-click Log_Collector "./docs/passivedns_sensor.md"
-click logformat "./docs/log_format.md"
+click Log_Collector "https://github.com/CERN-CERT/pDNSSOC/blob/main/docs/log_collection.md"
+click logformat "https://github.com/CERN-CERT/pDNSSOC/blob/main/docs/log_format.md"
 click MISP "https://www.misp-project.org/"
-click Log_Ingestion "./docs/correlation_engine"
+click Log_Ingestion "https://github.com/CERN-CERT/pDNSSOC/blob/main/docs/correlation_engine.md"
 
 ```
 
