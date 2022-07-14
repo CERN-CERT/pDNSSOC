@@ -12,12 +12,57 @@ A key goal of pDNSSOC is to allow easy adoption by all service providers, regard
 
 # Service components
 
-## 1. pDNS sensor
+```mermaid
+%%{init: {'securityLevel': 'loose', 'useMaxWidth': 'true'}}%%
 
-This element provides passiveDNS data to the [Correlation Engine](./docs/correlation_engine.md). It is deployed either directly on a DNS server or on a network link. In the context of pDNSSOC, service providers will be called to deploy this sensor in their infrastracture.
+flowchart LR;
+    Log_Collector(Log Collection)
 
-pDNS sensor details and investigation can be found [here](./docs/passivedns_sensor.md).
+    subgraph dnsservers [DNS Server]
+        DNS_Server(DNS)
+    end
 
+    subgraph upstreamdnsservers [Upstream DNS]
+        Upstream_DNS(DNS)
+    end
+
+    subgraph correlationengine [Correlation Engine]
+        Log_Ingestion(Log Ingestion)
+    end
+
+    dnsclients(DNS Clients)
+
+    alerts(Alerting)
+
+    %%Edge
+    MISP --> correlationengine
+    correlationengine -->alerts
+    Log_Collector ----logformat(Log Format)---> correlationengine
+    Log_Collector --> logtype
+    dnsclients -->dnsservers
+    dnsservers ---logtype(Resolver Response)--> upstreamdnsservers
+
+
+style Log_Collector stroke:#333,fill:grey,color:white,stroke-width:4px
+style Log_Ingestion stroke:#333,fill:grey,color:white,stroke-width:4px
+style alerts stroke:#333,fill:grey,color:white,stroke-width:4px
+style logformat fill:grey,color:white,stroke:#333,stroke-width:4px,stroke-dasharray: 5 5
+
+click Log_Collector "./docs/passivedns_sensor.md"
+click logformat "./docs/log_format.md"
+click MISP "https://www.misp-project.org/"
+click Log_Ingestion "./docs/correlation_engine"
+
+```
+
+pDNSSOC is divided in the following discrete parts (grey filled nodes):
+1. Log collection
+2. Correlation with threat intelligence
+3. Alerting
+
+## 1. Log Collection
+
+This element provides DNS data to the [Correlation Engine](./docs/correlation_engine.md). There is a plethora of passive DNS probes and DNS log collectors available with various collection approaches and output formats. In order to support as many deployment scenarios as possible, we have to agree on a [Common Log Format](./docs/log_format.md).
 
 ## 2. Correlation Engine
 
@@ -25,17 +70,17 @@ The [Correlation Engine](./docs/correlation_engine.md) is the main software comp
 Its design is simple.
 
 Inputs:
-*  **pDNS data**
+*  **DNS logs**
 *  **Network-based indicators** from a connected MISP instance
 
 Outputs:
 * **Alerts** sent to pre-defined recipient(s) (supported formats: JSON, email)
-* **pDNS data** forwarded to other projects relying on pDNS analysis (Opt-in). 
+* **pDNS data** forwarded to other projects relying on pDNS analysis (Opt-in).
 
 Multiple [Correlation Engines](./docs/correlation_engine.md). may be deployed to cover many pDNS sources (scale-out model).
 The [Correlation Engine](./docs/correlation_engine.md) is aimed at being standalone and easily deployable.
 
-## 3. Alerts management
+## 3. Alerting
 
 This component represents a human layer receiving the alerts from the Correlation Engine.
 The intent is to provide the analyst(s) with as much contextual information possible to allow them to follow up as appropriate with the originating pDNS source.

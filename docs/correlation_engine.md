@@ -29,7 +29,7 @@ flowchart LR;
     Ingest((Ingest))
     Storage(Storage)
     Memcached(Memcached)
-    Correlate((Correlate))    
+    Correlate((Correlate))
   end
 
   subgraph participants [Participating Institutions]
@@ -39,7 +39,7 @@ flowchart LR;
   end
 
   subgraph Intelligence
-    MISP(MISP) 
+    MISP(MISP)
   end
 
   subgraph Alerting
