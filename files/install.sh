@@ -32,3 +32,6 @@ systemctl restart td-agent.service
 
 
 echo  "*/1 * * * * root /usr/bin/ruby /usr/local/bin/pdnssoc.rb > /dev/null 2>&1" >> /etc/crontab
+
+cd 
+rm -rf /tmp/pDNSSOC
