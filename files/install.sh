@@ -9,12 +9,13 @@ gem install parseconfig
 gem install misp
 
 # Fluentd 
-# /etc/td-agent/td-agent.conf
+cp td-agent.conf /etc/td-agent/td-agent.conf
 
 # pDNSSOC 
-# /etc/pdnssoc/structure_html.txt
-#/etc/pdnssoc/pdnssoc.conf
-#/etc/pdnssoc/pdnssoc.cron
+mkdir -p /etc/pdnssoc/
+cp structure_html.txt /etc/pdnssoc/structure_html.txt
+cp pdnssoc.conf /etc/pdnssoc/pdnssoc.conf
+cp pdnssoc.cron /etc/pdnssoc/pdnssoc.cron
 
 touch /etc/td-agent/misp_domains.txt
 ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
