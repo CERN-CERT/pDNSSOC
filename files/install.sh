@@ -3,6 +3,7 @@
 
 # Packages installation
 yum -y install ruby git
+cd /tmp/
 git clone https://github.com/CERN-CERT/pDNSSOC/
 cd pDNSSOC/files
 
