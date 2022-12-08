@@ -2,7 +2,10 @@
 
 
 # Packages installation
-yum -y install ruby
+yum -y install ruby git
+git clone https://github.com/CERN-CERT/pDNSSOC/
+cd pDNSSOC/files
+
 curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
 td-agent-gem install fluent-plugin-filter-list
 gem install parseconfig
