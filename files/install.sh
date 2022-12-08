@@ -18,8 +18,10 @@ cp td-agent.conf /etc/td-agent/td-agent.conf
 # pDNSSOC 
 mkdir -p /etc/pdnssoc/
 cp structure_html.txt /etc/pdnssoc/structure_html.txt
+cp pdnssoc.rb /usr/local/bin/pdnssoc.rb
 cp pdnssoc.conf /etc/pdnssoc/pdnssoc.conf
 cp pdnssoc.cron /etc/pdnssoc/pdnssoc.cron
+
 
 touch /etc/td-agent/misp_domains.txt
 ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
@@ -28,5 +30,5 @@ ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
 # Start
 systemctl restart td-agent.service
 
-#/usr/local/bin/pdnssoc.rb
+
 echo  "*/1 * * * * root /usr/bin/ruby /usr/local/bin/pdnssoc.rb > /dev/null 2>&1" >> /etc/crontab
