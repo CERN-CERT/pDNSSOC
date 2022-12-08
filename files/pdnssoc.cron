@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# CRON file for pDNSSOC
+
+# Downloading MISP events
+
+jq  --raw-output '.misp_servers[] | "\(.api_key)|\(.url)|\(.parameter)"' /etc/pdnssoc/pdnssoc.conf |
+while IFS="|" read -r api_key url parameter; do
+         printf -v mycurl 'curl -qsS --header "Authorization: %s" "%s%s"\n' "$api_key" "$url" "$parameter"
+
+         raw_data=$( eval ${mycurl})
+         sorted_data=$(printf "$raw_data\n"|sort -u)
+         printf "$sorted_data\n" > /etc/td-agent/misp_domains.txt
+
+    done
+
+
+# Reload the configuration file for fluentd
+
+kill -1 `cat /var/run/td-agent/td-agent.pid`
