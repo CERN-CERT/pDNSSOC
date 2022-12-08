@@ -1,8 +1,14 @@
 #!/bin/bash
 
+rm -f /etc/pdnssoc/pdnssoc.cron 2> /dev/null
+rm -f /etc/pdnssoc/pdnssoc.conf 2> /dev/null
+rm -f /usr/local/bin/pdnssoc.rb 2> /dev/null
+rm -f /etc/pdnssoc/structure_html.txt 2> /dev/null
+rm -f /etc/cron.hourly/pdnssoc_misp 2> /dev/null
+rm -f /etc/td-agent/td-agent.conf 2> /dev/null
 
 # Packages installation
-yum -y install ruby git
+yum -y install ruby git jq
 cd /tmp/
 git clone https://github.com/CERN-CERT/pDNSSOC/
 cd pDNSSOC/files
