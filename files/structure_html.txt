@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>
+body { font-family: sans-serif; font-size: 10pt; }
+h1 { font-size: 16pt; }
+table th { padding: 10px; border-top: 1px solid #fafafa; border-bottom: 1px solid #e0e0e0; background: #ededed; background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb)); background: -moz-linear-gradient(top,  #ededed,  #ebebeb); }
+table { border-collapse: collapse; border-spacing: 0; }
+table td, table th { border: 1px solid #ccc; }
+table td { padding: 2px 5px; }
+</style>
+</head>
+<body>
+    <table>
+        <tbody>
+            %{data}
+        </tbody>
+    </table>
+</body>
+</html>
