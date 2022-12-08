@@ -22,6 +22,8 @@ cp pdnssoc.rb /usr/local/bin/pdnssoc.rb
 cp pdnssoc.conf /etc/pdnssoc/pdnssoc.conf
 cp pdnssoc.cron /etc/pdnssoc/pdnssoc.cron
 
+chmod +x /etc/pdnssoc/pdnssoc.cron
+chmod +x /usr/local/bin/pdnssoc.rb
 
 touch /etc/td-agent/misp_domains.txt
 ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
