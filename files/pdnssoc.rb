@@ -1,11 +1,11 @@
 require "misp"
 require "json"
-require "parseconfig"
 require 'net/smtp'
-
+require 'parseconfig'
 
 class ConfigAlerts
   @@config = JSON.parse(File.read("/etc/pdnssoc/pdnssoc.conf"))
+  @@bad_domains = File.read("/etc/td-agent/misp_domains.txt")
 end
 
 class Alert < ConfigAlerts
@@ -230,7 +230,7 @@ class Email < ConfigAlerts
 
     Net::SMTP.start(@email_config["server"], @email_config["port"]) do |smtp|
       smtp.send_message message, @email_config["from"], @email_config["to"]
-      #puts "Email sent"
+      puts "Email sent"
     end
   end
 
@@ -262,24 +262,26 @@ class Trigger < ConfigAlerts
 
   def delete_logs()
     for filename in @processed_logs
-      #puts("Deleting: " + filename)
+      puts("Deleting: " + filename)
       File.delete(filename) if File.exist?(filename)
     end
   end
 
   def run()
     @alerts.each_line do |line|
-      json_log_read = JSON.parse(line)
-      domain = json_log_read["query"]
-      if ! @all_results.keys.include?(domain)
-        alert = Alert.new(json_log_read)
-        results = alert.parse_log()
-        if results != {}
-          @all_results[domain] = results
-        end
-      else
-        @all_results[domain]["count"] += 1
-      end      
+        json_log_read = JSON.parse(line)
+        domain = json_log_read["query"]
+        if @@bad_domains.include?(domain)
+            if ! @all_results.keys.include?(domain)
+                alert = Alert.new(json_log_read)
+                results = alert.parse_log()
+                if results != {}
+                @all_results[domain] = results
+                end
+            else
+                @all_results[domain]["count"] += 1
+            end
+        end      
     end
 
     if @all_results != {}
@@ -298,4 +300,3 @@ end
 
 trigger = Trigger.new()
 trigger.run()
-
