@@ -8,7 +8,7 @@ rm -f /usr/local/bin/pdnssoc.rb 2> /dev/null
 rm -f /etc/pdnssoc/structure_html.txt 2> /dev/null
 rm -f /etc/cron.hourly/pdnssoc_misp 2> /dev/null
 rm -f /etc/td-agent/td-agent.conf 2> /dev/null
-sed '/pdnssoc\.rb/d' /etc/crontab
+sed '/pdnssoc\.rb/d' -i /etc/crontab
 
 echo "Installing system packages."
 # Packages installation
