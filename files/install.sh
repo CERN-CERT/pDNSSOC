@@ -46,10 +46,6 @@ ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
 
 echo  "*/1 * * * * root /usr/bin/ruby /usr/local/bin/pdnssoc.rb > /dev/null 2>&1" >> /etc/crontab
 
-echo "Running the first cron."
-
-/etc/pdnssoc/pdnssoc.cron
-
 echo "Starting Fluentd."
 
 # Start
