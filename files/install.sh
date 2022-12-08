@@ -46,6 +46,12 @@ ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
 
 echo  "*/1 * * * * root /usr/bin/ruby /usr/local/bin/pdnssoc.rb > /dev/null 2>&1" >> /etc/crontab
 
+# Disabling the local firewall, which obviously nobody should ever do
+
+echo "Disabling the local firewall."
+systemctl disable firewalld 
+systemctl stop firewalld 
+
 echo "Starting Fluentd."
 
 # Start
