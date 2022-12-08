@@ -19,7 +19,7 @@ cd pDNSSOC/files
 
 echo "Installing Fluentd."
 curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
-td-agent-gem install fluent-plugin-filter-list
+td-agent-gem install fluent-plugin-filter-list --force
 
 echo "Installing Ruby dependencies."
 gem install parseconfig
