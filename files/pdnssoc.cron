@@ -6,13 +6,16 @@
 
 jq  --raw-output '.misp_servers[] | "\(.api_key)|\(.url)|\(.parameter)"' /etc/pdnssoc/pdnssoc.conf |
 while IFS="|" read -r api_key url parameter; do
-         printf -v mycurl 'curl -qsS --header "Authorization: %s" "%s%s"\n' "$api_key" "$url" "$parameter"
+         printf -v mycurl 'curl -k -qsS --header "Authorization: %s" "%s%s"\n' "$api_key" "$url" "$parameter"
 
          raw_data=$( eval ${mycurl})
          sorted_data=$(printf "$raw_data\n"|sort -u)
          printf "$sorted_data\n" > /etc/td-agent/misp_domains.txt
 
     done
+
+
+# Add something below to send an alert to the security contact if misp_domains.txt is empty
 
 
 # Reload the configuration file for fluentd
