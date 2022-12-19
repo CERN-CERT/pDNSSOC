@@ -3,8 +3,20 @@ require "json"
 require 'net/smtp'
 require 'parseconfig'
 
+# events = MISP::Event.search(info: "test")
+#events = MISP::Event.get(39143)
+
+#event = MISP::Event.search(info: "Phishing indicators 31/22")
+#events = MISP::Event.search(info: "test")
+#
+#puts  attributes.inspect
+#puts event.methods.sort
+
+#File.readlines('/var/log/td-agent/td-agent.log').each do |line|
+
 class ConfigAlerts
   @@config = JSON.parse(File.read("/etc/pdnssoc/pdnssoc.conf"))
+  #@@config = JSON.parse(File.read("./pdnssoc_conf.json"))
   @@bad_domains = File.read("/etc/td-agent/misp_domains.txt")
 end
 
@@ -164,11 +176,11 @@ class Email < ConfigAlerts
     $result_html = '<tr>'
 
     num_events = result_json["misp"].length
-
-    pdns_client = @pdns_config[result_json["client"]]["name"]
+    ip_client = result_json["client"]
     
     # pDNS Client
-    if pdns_client
+    if @pdns_config[ip_client] and @pdns_config[ip_client].keys.include?("name")
+      pdns_client = @pdns_config[result_json["client"]]["name"]
       client_info = "%{n} (%{m})" % [n: pdns_client, m: result_json["client"]]
       $result_html += @html_alert_cell % [r: num_events, s: client_info]
     else
