@@ -227,6 +227,7 @@ class Email < ConfigAlerts
   end
 
   def get_html(ref_html, data, list_params=[], index="")
+    # Use the data gathered to buil one html row of the table that will be send by email
     html_append = ""
     if list_params == []
       html_append += ref_html % [r: index, s: data]
@@ -390,7 +391,7 @@ class Trigger < ConfigAlerts
         if ! skip_domains.include?(domain)
           # If it is a malicious domain
           if @@bad_domains.include?(domain)
-            # If it was already analyzed -> +1
+            # If it was already analyzed -> counter +1 but we will not query it again
             if ! all_alerts.empty? and all_alerts.keys.include?(email_client) and all_alerts[email_client].keys.include?(domain)
               all_alerts[email_client][domain]["count"] += 1
             else 
@@ -406,6 +407,7 @@ class Trigger < ConfigAlerts
               all_alerts[email_client] = {domain: @data_malicious_domain}
             end  
           else
+            # If it is not a malicious domain -> skip it next time
             skip_domains.append(domain)
           end
         end
