@@ -4,7 +4,7 @@ echo "Cleaning the room."
 
 rm -f /etc/pdnssoc/pdnssoc.cron 2> /dev/null
 rm -f /etc/pdnssoc/pdnssoc.conf 2> /dev/null
-rm -f /usr/local/bin/pdnssoc.rb 2> /dev/null
+rm -f /usr/local/bin/*.rb 2> /dev/null
 rm -f /etc/pdnssoc/structure_html.txt 2> /dev/null
 rm -f /etc/cron.hourly/pdnssoc_misp 2> /dev/null
 rm -f /etc/td-agent/td-agent.conf 2> /dev/null
@@ -32,7 +32,7 @@ cp td-agent.conf /etc/td-agent/td-agent.conf
 # pDNSSOC 
 mkdir -p /etc/pdnssoc/
 cp structure_html.txt /etc/pdnssoc/structure_html.txt
-cp pdnssoc.rb /usr/local/bin/pdnssoc.rb
+cp *.rb /usr/local/bin/*.rb
 cp pdnssoc.conf /etc/pdnssoc/pdnssoc.conf
 cp pdnssoc.cron /etc/pdnssoc/pdnssoc.cron
 
