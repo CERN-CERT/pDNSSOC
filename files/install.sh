@@ -32,7 +32,7 @@ cp td-agent.conf /etc/td-agent/td-agent.conf
 # pDNSSOC 
 mkdir -p /etc/pdnssoc/
 cp structure_html.txt /etc/pdnssoc/structure_html.txt
-cp code/*.rb /usr/local/bin/*.rb
+cp code/*.rb /usr/local/bin/
 cp pdnssoc.conf /etc/pdnssoc/pdnssoc.conf
 cp pdnssoc.cron /etc/pdnssoc/pdnssoc.cron
 
