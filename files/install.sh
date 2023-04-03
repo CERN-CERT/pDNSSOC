@@ -45,7 +45,9 @@ chmod +x /usr/local/bin/pdnssoc.rb
 touch /etc/td-agent/misp_domains.txt
 ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
 
-echo  "*/1 * * * * root /usr/bin/ruby /usr/local/bin/pdnssoc.rb > /dev/null 2>&1" >> /etc/crontab
+echo  "*/1 * * * * /usr/bin/ruby /usr/local/bin/pdnssoc.rb" >> /etc/crontab
+
+# An empty line is required at the end of this file for a valid cron file.
 
 # Disabling the local firewall, which obviously nobody should ever do
 
