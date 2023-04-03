@@ -22,8 +22,10 @@ curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
 td-agent-gem install fluent-plugin-filter-list --force
 
 echo "Installing Ruby dependencies."
-gem install parseconfig
-gem install misp
+td-agent-gem install parseconfig
+td-agent-gem install misp
+
+
 
 echo "Moving pDNSSOC files around."
 # Fluentd 
