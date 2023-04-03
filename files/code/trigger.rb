@@ -26,7 +26,7 @@ class Trigger
 
   def delete_logs()
     for filename in @processed_logs
-      puts("Deleting: " + filename)
+      @@log_sys.debug("Deleting: " + filename)
       File.delete(filename) if File.exist?(filename)
     end
   end
@@ -54,7 +54,6 @@ class Trigger
     skip_domains = []
     skip_misp_servers = []
     all_alerts = {}
-
     # Read each line of the log wrote by fluentd
     @alerts.each_line do |line|
       json_log_read = JSON.parse(line)
@@ -63,7 +62,6 @@ class Trigger
         ip_client = json_log_read["client"]
         first_occurrence = json_log_read["date"]
         email_client = get_email_client(ip_client)
-        
         # Domains that are legit or that do not have information in MISP will be skipped
         if ! skip_domains.include?(domain)
           # If it is a malicious domain
@@ -102,14 +100,13 @@ class Trigger
     end
 
     if all_alerts.empty?
-      puts "No alerts found!"
+      @@log_sys.debug("No alerts found!")
     else
       # We will send an alert to each client (with an email on the config file) and to the general security contact
       all_alerts.each do |email_client, client_data|
         email = Email.new()
         message = email.build_email(client_data)
         email.send_email(email_client, message) 
-        
       end
       # If the send_email is not successful the logs will not be deleted
       delete_logs()
