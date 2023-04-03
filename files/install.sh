@@ -24,7 +24,6 @@ td-agent-gem install fluent-plugin-filter-list --force
 echo "Installing Ruby dependencies."
 td-agent-gem install parseconfig
 td-agent-gem install misp
-td-agent-gem install json
 
 echo "Moving pDNSSOC files around."
 # Fluentd 
