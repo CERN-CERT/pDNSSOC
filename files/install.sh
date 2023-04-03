@@ -12,7 +12,7 @@ sed '/pdnssoc\.rb/d' -i /etc/crontab
 
 echo "Installing system packages."
 # Packages installation
-yum -y install ruby git jq
+yum -y install ruby git jq ruby-devel
 cd /tmp/
 git clone https://github.com/CERN-CERT/pDNSSOC/
 cd pDNSSOC/files
@@ -24,7 +24,7 @@ td-agent-gem install fluent-plugin-filter-list --force
 echo "Installing Ruby dependencies."
 td-agent-gem install parseconfig
 td-agent-gem install misp
-
+td-agent-gem install json
 
 
 echo "Moving pDNSSOC files around."
