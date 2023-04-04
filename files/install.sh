@@ -46,7 +46,7 @@ chmod +x /usr/local/bin/pdnssoc/pdnssoc.rb
 touch /etc/td-agent/misp_domains.txt
 ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
 
-echo  "*/1 * * * * /opt/td-agent/bin/ruby /usr/local/bin/pdnssoc/pdnssoc.rb" >> /etc/crontab
+echo  "*/1 * * * * root /opt/td-agent/bin/ruby /usr/local/bin/pdnssoc/pdnssoc.rb" >> /etc/crontab
 
 # An empty line is required at the end of this file for a valid cron file.
 
