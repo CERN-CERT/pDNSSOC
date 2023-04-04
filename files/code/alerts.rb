@@ -46,6 +46,7 @@ class Alert
                   'misp_uuid' => misp_event.uuid,
                   'misp_info' => misp_event.info,
                   'misp_id' => misp_event.id,
+                  'misp_domain' => misp_data["domain"],
                   'num_iocs' => misp_event.attribute_count,
                   'publication' => misp_event.date,
                   'organisation' => misp_event.orgc.name,
