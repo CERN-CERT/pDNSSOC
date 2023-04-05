@@ -47,7 +47,11 @@
                 </tr>
                 <% all_results.each do |domain, result_domain| %>
                     <tr>
-                        <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><%= result_domain["client_ip"] %></td>
+                        <% if result_domain["client_name"] == "" %>
+                            <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><%= result_domain["client_ip"] %></td>
+                        <% else %>
+                            <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><%= result_domain["client_name"] %> (<%= result_domain["client_ip"] %>)</td>
+                        <% end %>
                         <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><%= Time.at(result_domain["first_occurrence"]).strftime(TIME_FORMAT_YMD) %></td>
                         <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><a href="" target="_new"><%= result_domain["domain"] %></a></td>
                         <% result_domain["misp"].each_with_index do |misp_event, idx_event| %>

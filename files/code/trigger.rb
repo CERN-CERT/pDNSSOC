@@ -105,8 +105,7 @@ class Trigger
       # We will send an alert to each client (with an email on the config file) and to the general security contact
       all_alerts.each do |email_client, client_data|
         email = Email.new()
-        message = email.build_email(client_data)
-        email.send_email(email_client, message) 
+        email.send_email(email_client, client_data) 
       end
       # If the send_email is not successful the logs will not be deleted
       delete_logs()
