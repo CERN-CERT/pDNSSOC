@@ -105,6 +105,7 @@ class Alert
 
     if $num_misp_events > 0
       result_domain = {
+        'misp_domain' => misp_server['domain'],
         'client_ip' => ip_client,
         'client_name' => name_client,
         'count' => 1,
