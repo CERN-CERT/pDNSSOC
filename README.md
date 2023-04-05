@@ -122,19 +122,13 @@ git clone https://github.com/CERN-CERT/pDNSSOC.git
 3. Go to the `files` directory inside the repo.
 4. Populate the configuration `pdnssoc.conf` with the MISP server(s) details and the alert emails details.
 5. Make any changes (if needed) on the fluentd configuration `td-agent.conf`.
-6. Build the docker image:
+6. Start the docker container:
 
 ```
-sudo docker build -t pdnssoc .
+docker compose up
 ```
 
-7. Start the docker container:
-
-```
-sudo docker compose up
-```
-
-8. That's it!
+7. That's it!
 
 
 Directory structure:
