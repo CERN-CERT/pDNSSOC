@@ -87,6 +87,7 @@ Directory structure:
 /etc/pdnssoc/pdnssoc.conf
 /etc/pdnssoc/notification_email.html
 /etc/td-agent/misp_domains.txt
+/etc/td-agent/td-agent.conf
 /var/log/td-agent/alerts.log
 /var/log/td-agent/pdnssoc_sys.log
 /var/log/td-agent/alerts.log
@@ -96,7 +97,6 @@ Directory structure:
 /var/log/td-agent/pdnssoc-alerts/results
 /var/log/td-agent/pdnssoc_sys.log
 /var/log/td-agent/queries
-
 ```
 
 
@@ -122,13 +122,19 @@ git clone https://github.com/CERN-CERT/pDNSSOC.git
 3. Go to the `files` directory inside the repo.
 4. Populate the configuration `pdnssoc.conf` with the MISP server(s) details and the alert emails details.
 5. Make any changes (if needed) on the fluentd configuration `td-agent.conf`.
-6. Start the docker container:
+6. Build the docker container:
+
+```
+docker build -t pdnssoc .
+```
+
+7. Start the docker container:
 
 ```
 docker compose up
 ```
 
-7. That's it!
+8. That's it!
 
 
 Directory structure:
