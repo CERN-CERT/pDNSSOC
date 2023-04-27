@@ -88,15 +88,15 @@ Directory structure:
 /etc/pdnssoc/notification_email.html
 /etc/td-agent/misp_domains.txt
 /etc/td-agent/td-agent.conf
+/var/log/td-agent/td-agent.log
 /var/log/td-agent/alerts.log
 /var/log/td-agent/pdnssoc_sys.log
 /var/log/td-agent/alerts.log
+/var/log/td-agent/pdnssoc_sys.log
 /var/log/td-agent/buffer
-/var/log/td-agent/pdnssoc-alerts
+/var/log/td-agent/queries
 /var/log/td-agent/pdnssoc-alerts/pdnssoc-buffer
 /var/log/td-agent/pdnssoc-alerts/results
-/var/log/td-agent/pdnssoc_sys.log
-/var/log/td-agent/queries
 ```
 
 
