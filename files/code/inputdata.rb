@@ -48,13 +48,7 @@ module InputData
       current_group << file
       current_group_size += file_size
     end
-
-    # Print the grouped files
-    # groups.each_with_index do |group, index|
-    #   puts "Group #{index + 1}:"
-    #   group.each { |file| puts "- #{file}" }
-    #   puts '-' * 20
-    # end
+    groups << current_group
     return groups 
   end
 end
