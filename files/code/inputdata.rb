@@ -1,6 +1,8 @@
-
+require_relative 'constants'
 require 'fileutils'
+
 class InputData
+  include ConstantsData
 
   def get_path_logs(group_of_files)
     alerts = ""
@@ -13,13 +15,8 @@ class InputData
   end
 
   def get_groups()
-    RGX_FILE_TIME = "/\d{8}-\d{4}/"
-    PATH_XXX = '/var/log/td-agent/pdnssoc-alerts/'
-    RGX_FILE_REF = 'pdnssoc-buffer.*.log'
-    GROUP_SIZE = 500 * 1024 * 1024
-
     # Get a list of all files in the directory
-    files = Dir.glob(File.join(PATH_XXX, RGX_FILE_REF))
+    files = Dir.glob(File.join(PATH_ALERTS, RGX_FILE_REF))
 
     # Sort files by date extracted from the filename, newest first
     sorted_files = files.sort_by do |file|
