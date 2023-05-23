@@ -1,7 +1,7 @@
 require_relative 'constants'
 require 'fileutils'
 
-class InputData
+module InputData
   include ConstantsData
 
   def get_path_logs(group_of_files)
