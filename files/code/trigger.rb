@@ -11,7 +11,6 @@ class Trigger
 
   def initialize()
     super()
-    @alerts, @processed_logs = get_path_logs()
   end
 
   def delete_logs(processed_logs)
@@ -81,8 +80,8 @@ class Trigger
       rescue Exception => e
         raise Exception, TRIGGER_ERROR % [e:e]
       end
-      return all_alerts
     end
+  return all_alerts
   end
 
   def run()
