@@ -33,6 +33,12 @@ class Trigger
     return email_client
   end 
 
+  def check_alert_keys(json_log_read)
+    required_keys = ["query", "client", "date"]
+    all_required_keys = required_keys.all? { |string| json_log_read.key?(string) }
+    return all_required_keys
+  end
+
   def analize_domains(group_of_files)
     skip_domains = []
     skip_misp_servers = []
@@ -42,6 +48,11 @@ class Trigger
       File.readlines(filename).each do |line|
         json_log_read = JSON.parse(line)
         begin
+          if ! check_alert_keys(json_log_read)
+            @@log_sys.error(MISSING_KEY_ALERT % line)
+            next
+          end
+          
           domain = json_log_read["query"]
           ip_client = json_log_read["client"]
           first_occurrence = json_log_read["date"]
@@ -56,7 +67,8 @@ class Trigger
               else 
                 # We don't have information so we will query MISP
                 alert = Alert.new()
-                @data_malicious_domain = alert.parse_log(domain, ip_client, first_occurrence, skip_misp_servers)
+                date = Time.parse(first_occurrence).to_i
+                @data_malicious_domain = alert.parse_log(domain, ip_client, date, skip_misp_servers)
                 # If we detected that there are MISP servers that fail we will skip it/them next time
                 faulty_misp = alert.get_faulty_misp()
                 if ! faulty_misp.empty?
@@ -98,9 +110,9 @@ class Trigger
           email = Email.new()
           email.send_email(email_client, client_data) 
         end
-        # If the send_email is not successful the logs will not be deleted
-        delete_logs(group_of_files)
       end
+      # If the send_email is not successful the logs will not be deleted
+      delete_logs(group_of_files)
     end
   end
 end

@@ -109,7 +109,7 @@ class Alert
         'client_ip' => ip_client,
         'client_name' => name_client,
         'count' => 1,
-        'first_occurrence' => Time.parse(date).to_i,
+        'first_occurrence' => date,
         'domain' => domain,
         "misp" => events
       }
