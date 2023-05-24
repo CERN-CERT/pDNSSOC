@@ -4,16 +4,6 @@ require 'fileutils'
 module InputData
   include ConstantsData
 
-  def get_path_logs(group_of_files)
-    alerts = ""
-    for filename in group_of_files
-      File.readlines(filename).each do |line|
-        alerts += line
-      end
-    end
-    return alerts
-  end
-
   def get_groups()
     # Get a list of all files in the directory
     files = Dir.glob(File.join(PATH_ALERTS, RGX_FILE_REF))

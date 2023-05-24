@@ -33,52 +33,54 @@ class Trigger
     return email_client
   end 
 
-  def analize_domains(alerts)
+  def analize_domains(group_of_files)
     skip_domains = []
     skip_misp_servers = []
     all_alerts = {}
     # Read each line of the log wrote by fluentd
-    alerts.each_line do |line|
-      json_log_read = JSON.parse(line)
-      begin
-        domain = json_log_read["query"]
-        ip_client = json_log_read["client"]
-        first_occurrence = json_log_read["date"]
-        email_client = get_email_client(ip_client)
-        # Domains that are legit or that do not have information in MISP will be skipped
-        if ! skip_domains.include?(domain)
-          # If it is a malicious domain
-          if @@bad_domains.include?(domain)
-            # If it was already analyzed -> +1
-            if ! all_alerts.empty? and all_alerts.include?(email_client) and all_alerts[email_client].include?(domain)
-              all_alerts[email_client][domain]["count"] += 1
-            else 
-              # We don't have information so we will query MISP
-              alert = Alert.new()
-              @data_malicious_domain = alert.parse_log(domain, ip_client, first_occurrence, skip_misp_servers)
-              # If we detected that there are MISP servers that fail we will skip it/them next time
-              faulty_misp = alert.get_faulty_misp()
-              if ! faulty_misp.empty?
-                skip_misp_servers = skip_misp_servers.concat(faulty_misp).uniq
+    for filename in group_of_files
+      File.readlines(filename).each do |line|
+        json_log_read = JSON.parse(line)
+        begin
+          domain = json_log_read["query"]
+          ip_client = json_log_read["client"]
+          first_occurrence = json_log_read["date"]
+          email_client = get_email_client(ip_client)
+          # Domains that are legit or that do not have information in MISP will be skipped
+          if ! skip_domains.include?(domain)
+            # If it is a malicious domain
+            if @@bad_domains.include?(domain)
+              # If it was already analyzed -> +1
+              if ! all_alerts.empty? and all_alerts.include?(email_client) and all_alerts[email_client].include?(domain)
+                all_alerts[email_client][domain]["count"] += 1
+              else 
+                # We don't have information so we will query MISP
+                alert = Alert.new()
+                @data_malicious_domain = alert.parse_log(domain, ip_client, first_occurrence, skip_misp_servers)
+                # If we detected that there are MISP servers that fail we will skip it/them next time
+                faulty_misp = alert.get_faulty_misp()
+                if ! faulty_misp.empty?
+                  skip_misp_servers = skip_misp_servers.concat(faulty_misp).uniq
+                end
               end
-            end
-            if @data_malicious_domain.empty?            
-              # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
-              skip_domains.append(domain)
+              if @data_malicious_domain.empty?            
+                # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
+                skip_domains.append(domain)
+              else
+                # We have found data in MISP about this domain -> we will report it to the right client
+                if ! all_alerts.include?(email_client)
+                  all_alerts[email_client] = {}
+                end
+                all_alerts[email_client][domain] = @data_malicious_domain
+                @@log_alerts.info(@data_malicious_domain)
+              end  
             else
-              # We have found data in MISP about this domain -> we will report it to the right client
-              if ! all_alerts.include?(email_client)
-                all_alerts[email_client] = {}
-              end
-              all_alerts[email_client][domain] = @data_malicious_domain
-              @@log_alerts.info(@data_malicious_domain)
-            end  
-          else
-            skip_domains.append(domain)
+              skip_domains.append(domain)
+            end
           end
+        rescue Exception => e
+          raise Exception, TRIGGER_ERROR % [e:e]
         end
-      rescue Exception => e
-        raise Exception, TRIGGER_ERROR % [e:e]
       end
     end
   return all_alerts
@@ -87,8 +89,7 @@ class Trigger
   def run()
     groups = get_groups()
     for group_of_files in groups
-      alerts, processed_logs = get_path_logs(group_of_files)
-      all_alerts = analize_domains(alerts)
+      all_alerts = analize_domains(group_of_files)
       if all_alerts.empty?
         @@log_sys.debug("No alerts found!")
       else
@@ -102,4 +103,4 @@ class Trigger
       end
     end
   end
-end  
+end
