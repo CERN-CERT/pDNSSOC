@@ -22,7 +22,7 @@ class Alert
 
     # Setup config MISP server
     MISP.configure do |config|
-      config.api_endpoint = misp_url + misp_data["parameter"]
+      config.api_endpoint = misp_url + misp_data["parameter_domains"]
       config.api_key = misp_api_key
     end   
 
