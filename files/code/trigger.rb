@@ -2,39 +2,22 @@ require_relative 'configalerts'
 require_relative 'email'
 require_relative 'alerts'
 require_relative 'constants'
+require_relative 'inputdata'
 require "time"
 
 class Trigger 
   include ConfigAlerts
+  include InputData
 
   def initialize()
     super()
-    @alerts, @processed_logs = get_path_logs()
   end
 
-  def get_path_logs()
-    @alerts = ""
-    @processed_logs = []
-    Dir.glob(@@alerts_config + "*.log") do |filename|
-      File.readlines(filename).each do |line|
-        @alerts += line
-      end
-      @processed_logs.append(filename)
-    end
-    return @alerts, @processed_logs
-  end
-
-  def delete_logs()
-    for filename in @processed_logs
+  def delete_logs(processed_logs)
+    for filename in processed_logs
       @@log_sys.debug("Deleting: " + filename)
       File.delete(filename) if File.exist?(filename)
     end
-  end
-
-  def retreive_data(domain)
-    # If we already have the info for this domain -> +1
-    results = ""
-    return results
   end
 
   def get_email_client(ip_client)
@@ -50,65 +33,86 @@ class Trigger
     return email_client
   end 
 
-  def run()
+  def check_alert_keys(json_log_read)
+    required_keys = ["query", "client", "date"]
+    all_required_keys = required_keys.all? { |string| json_log_read.key?(string) }
+    return all_required_keys
+  end
+
+  def analize_domains(group_of_files)
     skip_domains = []
     skip_misp_servers = []
     all_alerts = {}
     # Read each line of the log wrote by fluentd
-    @alerts.each_line do |line|
-      json_log_read = JSON.parse(line)
-      begin
-        domain = json_log_read["query"]
-        ip_client = json_log_read["client"]
-        first_occurrence = json_log_read["date"]
-        email_client = get_email_client(ip_client)
-        # Domains that are legit or that do not have information in MISP will be skipped
-        if ! skip_domains.include?(domain)
-          # If it is a malicious domain
-          if @@bad_domains.include?(domain)
-            # If it was already analyzed -> +1
-            if ! all_alerts.empty? and all_alerts.include?(email_client) and all_alerts[email_client].include?(domain)
-              all_alerts[email_client][domain]["count"] += 1
-            else 
-              # We don't have information so we will query MISP
-              alert = Alert.new()
-              @data_malicious_domain = alert.parse_log(domain, ip_client, first_occurrence, skip_misp_servers)
-              # If we detected that there are MISP servers that fail we will skip it/them next time
-              faulty_misp = alert.get_faulty_misp()
-              if ! faulty_misp.empty?
-                skip_misp_servers = skip_misp_servers.concat(faulty_misp).uniq
-              end
-            end
-            if @data_malicious_domain.empty?            
-              # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
-              skip_domains.append(domain)
-            else
-              # We have found data in MISP about this domain -> we will report it to the right client
-              if ! all_alerts.include?(email_client)
-                all_alerts[email_client] = {}
-              end
-              all_alerts[email_client][domain] = @data_malicious_domain
-              @@log_alerts.info(@data_malicious_domain)
-            end  
-          else
-            skip_domains.append(domain)
+    for filename in group_of_files
+      File.readlines(filename).each do |line|
+        json_log_read = JSON.parse(line)
+        begin
+          if ! check_alert_keys(json_log_read)
+            @@log_sys.error(MISSING_KEY_ALERT % line)
+            next
           end
+          
+          domain = json_log_read["query"]
+          ip_client = json_log_read["client"]
+          first_occurrence = json_log_read["date"]
+          email_client = get_email_client(ip_client)
+          # Domains that are legit or that do not have information in MISP will be skipped
+          if ! skip_domains.include?(domain)
+            # If it is a malicious domain
+            if @@bad_domains.include?(domain)
+              # If it was already analyzed -> +1
+              if ! all_alerts.empty? and all_alerts.include?(email_client) and all_alerts[email_client].include?(domain)
+                all_alerts[email_client][domain]["count"] += 1
+              else 
+                # We don't have information so we will query MISP
+                alert = Alert.new()
+                date = Time.parse(first_occurrence).to_i
+                @data_malicious_domain = alert.parse_log(domain, ip_client, date, skip_misp_servers)
+                # If we detected that there are MISP servers that fail we will skip it/them next time
+                faulty_misp = alert.get_faulty_misp()
+                if ! faulty_misp.empty?
+                  skip_misp_servers = skip_misp_servers.concat(faulty_misp).uniq
+                end
+              end
+              if @data_malicious_domain.empty?            
+                # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
+                skip_domains.append(domain)
+              else
+                # We have found data in MISP about this domain -> we will report it to the right client
+                if ! all_alerts.include?(email_client)
+                  all_alerts[email_client] = {}
+                end
+                all_alerts[email_client][domain] = @data_malicious_domain
+                @@log_alerts.info(@data_malicious_domain)
+              end  
+            else
+              skip_domains.append(domain)
+            end
+          end
+        rescue Exception => e
+          raise Exception, TRIGGER_ERROR % [e:e]
         end
-      rescue Exception => e
-        raise Exception, TRIGGER_ERROR % [e:e]
       end
     end
+  return all_alerts
+  end
 
-    if all_alerts.empty?
-      @@log_sys.debug("No alerts found!")
-    else
-      # We will send an alert to each client (with an email on the config file) and to the general security contact
-      all_alerts.each do |email_client, client_data|
-        email = Email.new()
-        email.send_email(email_client, client_data) 
+  def run()
+    groups = get_groups()
+    for group_of_files in groups
+      all_alerts = analize_domains(group_of_files)
+      if all_alerts.empty?
+        @@log_sys.debug("No alerts found!")
+      else
+        # We will send an alert to each client (with an email on the config file) and to the general security contact
+        all_alerts.each do |email_client, client_data|
+          email = Email.new()
+          email.send_email(email_client, client_data) 
+        end
       end
       # If the send_email is not successful the logs will not be deleted
-      delete_logs()
+      delete_logs(group_of_files)
     end
   end
 end

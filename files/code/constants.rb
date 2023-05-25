@@ -20,9 +20,17 @@ module ConstantsErrors
     UNKNOWN_CLIENT="An unknown client %{c} has been detected. Add it on the configuration file to receive alerts. "
     TRIGGER_ERROR = "DNS/pDNS queries cannot be read. %{e}"
     SMTP_ERROR = "The email could not be sent. Check the SMTP configuration."
+    MISSING_KEY_ALERT =	"One of the keys is missing for: %s. This log entry will be skipped"
 
 end
 
 module ConstantsAlerts
     TIMEOUT_MISP_QUERY = ENV['TIMEOUT_MISP_QUERY'] || 20
+end
+
+module ConstantsData
+    RGX_FILE_TIME = "/\d{8}-\d{4}/"
+    PATH_ALERTS = '/var/log/td-agent/pdnssoc-alerts/'
+    RGX_FILE_REF = 'pdnssoc-buffer.*.log'
+    GROUP_SIZE = 5 * 1024 * 1024
 end

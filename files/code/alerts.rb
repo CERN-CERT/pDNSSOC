@@ -22,7 +22,7 @@ class Alert
 
     # Setup config MISP server
     MISP.configure do |config|
-      config.api_endpoint = misp_url + misp_data["parameter"]
+      config.api_endpoint = misp_url + misp_data["parameter_domains"]
       config.api_key = misp_api_key
     end   
 
@@ -109,7 +109,7 @@ class Alert
         'client_ip' => ip_client,
         'client_name' => name_client,
         'count' => 1,
-        'first_occurrence' => Time.parse(date).to_i,
+        'first_occurrence' => date,
         'domain' => domain,
         "misp" => events
       }
