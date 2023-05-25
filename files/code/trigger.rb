@@ -117,7 +117,7 @@ class Trigger
         end
       end
       # If the send_email is not successful the logs will not be deleted
-      #delete_logs(group_of_files)
+      delete_logs(group_of_files)
     end
   end
 end
