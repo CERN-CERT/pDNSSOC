@@ -4,3 +4,4 @@ $stdout.sync = true
 
 trigger = Trigger.new()
 trigger.run()
+

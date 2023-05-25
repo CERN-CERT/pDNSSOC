@@ -19,6 +19,7 @@ module ConfigAlerts
     @@misp_config, @@alerts_config, @@email_config, @@pdns_config = init_config()
     # Get the list of bad domains
     @@bad_domains = File.read(PATH_MISP_D)
+    @@bad_ips = File.read(PATH_MISP_IP)
     # Get HTML template for the email
     @@html_email = init_html()
   end 
@@ -81,3 +82,4 @@ module ConfigAlerts
   
 end
   
+
