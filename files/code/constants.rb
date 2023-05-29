@@ -3,6 +3,7 @@ module ConstantsConfig
     PATH_LOG = ENV['PATH_LOG'] || "/var/log/td-agent/"
     PATH_PDNS_CONF = ENV['PATH_PDNS_CONF'] || "/etc/pdnssoc/pdnssoc.conf"
     PATH_MISP_D = ENV['PATH_MISP_D'] || "/etc/td-agent/misp_domains.txt"
+    PATH_MISP_IP = ENV['PATH_MISP_D'] || "/etc/td-agent/misp_ips.txt"
     PATH_HTML = ENV['PATH_HTML'] || "/etc/pdnssoc/notification_email.html"
     FILENAME_LOG_ALERT = ENV['FILENAME_LOG_ALERT'] || "alerts.log"
     FILENAME_LOG_SYS = ENV['FILENAME_LOG_SYS'] || "pdnssoc_sys.log"
@@ -34,3 +35,4 @@ module ConstantsData
     RGX_FILE_REF = 'pdnssoc-buffer.*.log'
     GROUP_SIZE = 5 * 1024 * 1024
 end
+

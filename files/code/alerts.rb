@@ -14,15 +14,15 @@ class Alert
     return @@faulty_misp_servers
   end
 
-  def query_misp(misp_data, domain, all_uuids)
+  def query_misp(misp_server, ioc_detected, type_ioc, all_uuids)
     result_misp = []
     list_uuids = [] 
-    misp_url = WEB_URL % [d: misp_data["domain"]] 
-    misp_api_key = misp_data["api_key"]
-
+    misp_url = WEB_URL % [d: misp_server["domain"]] 
+    misp_api_key = misp_server["api_key"]
+    api_endpoint = misp_url + misp_server["parameter_%{t}s" % [t:type_ioc]] # parameter_ips
     # Setup config MISP server
     MISP.configure do |config|
-      config.api_endpoint = misp_url + misp_data["parameter_domains"]
+      config.api_endpoint = api_endpoint
       config.api_key = misp_api_key
     end   
 
@@ -30,14 +30,14 @@ class Alert
     misp_events = []
     begin
       Timeout::timeout(TIMEOUT_MISP_QUERY) {
-        misp_events = MISP::Event.search(type: "domain", value: domain)
+        misp_events = MISP::Event.search(value: ioc_detected)
         # One domain can have multiple events associated
         for misp_event in misp_events
           # If there's a valid event and we did not processed it before proceed
           if not all_uuids.include? misp_event.uuid
             # Find the attribute where the malicious domain is defined
             for attribute in misp_event.attributes
-              if attribute.type == "domain" and attribute.value == domain and attribute.to_ids == true
+              if attribute.type.include?(type_ioc) and attribute.value == ioc_detected and attribute.to_ids == true
                 $tags = []
                 for tag in attribute.tags do
                   $tags.append({"colour" => tag.colour, "name" => tag.name})
@@ -46,7 +46,7 @@ class Alert
                   'misp_uuid' => misp_event.uuid,
                   'misp_info' => misp_event.info,
                   'misp_id' => misp_event.id,
-                  'misp_domain' => misp_data["domain"],
+                  'misp_server' => misp_server["domain"],
                   'num_iocs' => misp_event.attribute_count,
                   'publication' => misp_event.date,
                   'organisation' => misp_event.orgc.name,
@@ -83,17 +83,15 @@ class Alert
     return pdns_client
   end
 
-  def parse_log(domain, ip_client, date, faulty_misp)
-    result_domain = {}
-    name_client = get_client_info(ip_client, "name") 
-    # MISP Query
-    events = []
-    events_uuid = []
+  def parse_log(ioc_detected, type_ioc, date, ip_client)
+    result_ioc = {}
+    events = [] # MISP events detected for a particular IOC
+    events_uuid = [] # List of MISP uuid used to avoid repeat events
 
     for misp_server in @@misp_config
-      if ! faulty_misp.include?(misp_server["url"]) 
+      if ! @@faulty_misp_servers.include?(misp_server["url"]) 
         events_uuid = events_uuid.flatten
-        events_detected, uuids=query_misp(misp_server, domain, events_uuid)
+        events_detected, uuids=query_misp(misp_server, ioc_detected, type_ioc, events_uuid)
         if events_detected.length > 0
           events_uuid.append(uuids)
           events.append(events_detected)
@@ -104,17 +102,17 @@ class Alert
     $num_misp_events = events.length()
 
     if $num_misp_events > 0
-      result_domain = {
-        'misp_domain' => misp_server['domain'],
+      result_ioc= {
         'client_ip' => ip_client,
-        'client_name' => name_client,
+        'client_name' => get_client_info(ip_client, "name"),
         'count' => 1,
         'first_occurrence' => date,
-        'domain' => domain,
+        'ioc_detected' => ioc_detected,
         "misp" => events
       }
     end
-    return result_domain
+    return result_ioc
   end
 end
   
+

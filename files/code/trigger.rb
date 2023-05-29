@@ -11,6 +11,7 @@ class Trigger
 
   def initialize()
     super()
+    @@alerts_found = {}
   end
 
   def delete_logs(processed_logs)
@@ -39,74 +40,78 @@ class Trigger
     return all_required_keys
   end
 
-  def analize_domains(group_of_files)
-    skip_domains = []
-    skip_misp_servers = []
+  def study_ioc(list_iocs, ioc_detected, type_ioc, ip_client, date)
+    skip_iocs = []
+    # Domains that are legit or that do not have information in MISP will be skipped
+    begin
+      if ! skip_iocs.include?(ioc_detected)
+        # If it is a malicious domain
+        if list_iocs.include?(ioc_detected)
+          email_client = get_email_client(ip_client)
+          # If it was already analyzed -> +1
+          if ! @@alerts_found.empty? and @@alerts_found.include?(email_client) and \
+              @@alerts_found[email_client].include?(ioc_detected)
+            @@alerts_found[email_client][ioc_detected]["count"] += 1
+          else 
+            # We don't have information so we will query MISP
+            alert = Alert.new()                
+            @result_ioc = alert.parse_log(ioc_detected, type_ioc, date, ip_client)
+          end
+          if @result_ioc.empty?            
+            # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
+            skip_iocs.append(ioc_detected)
+          else
+            # We have found data in MISP about this domain -> we will report it to the right client
+            if ! @@alerts_found.include?(email_client)
+              @@alerts_found[email_client] = {}
+            end
+            @@alerts_found[email_client][ioc_detected] = @result_ioc
+            @@log_alerts.info(@result_ioc)
+          end
+        else
+          skip_iocs.append(ioc_detected)
+        end
+      end
+    rescue Exception => e
+      raise Exception, TRIGGER_ERROR % [e:e]
+    end
+  end
+
+  def analyze_all_iocs(group_of_files)
     all_alerts = {}
-    # Read each line of the log wrote by fluentd
+    # Iterate over all files inside the group
     for filename in group_of_files
+      # Read each line opf the file that represents one log entry
       File.readlines(filename).each do |line|
-        json_log_read = JSON.parse(line)
-        begin
-          if ! check_alert_keys(json_log_read)
+        json_log = JSON.parse(line)
+          # If the data is not complete -> skip log
+          if ! check_alert_keys(json_log)
             @@log_sys.error(MISSING_KEY_ALERT % line)
             next
           end
-          
-          domain = json_log_read["query"]
-          ip_client = json_log_read["client"]
-          first_occurrence = json_log_read["date"]
-          email_client = get_email_client(ip_client)
-          # Domains that are legit or that do not have information in MISP will be skipped
-          if ! skip_domains.include?(domain)
-            # If it is a malicious domain
-            if @@bad_domains.include?(domain)
-              # If it was already analyzed -> +1
-              if ! all_alerts.empty? and all_alerts.include?(email_client) and all_alerts[email_client].include?(domain)
-                all_alerts[email_client][domain]["count"] += 1
-              else 
-                # We don't have information so we will query MISP
-                alert = Alert.new()
-                date = Time.parse(first_occurrence).to_i
-                @data_malicious_domain = alert.parse_log(domain, ip_client, date, skip_misp_servers)
-                # If we detected that there are MISP servers that fail we will skip it/them next time
-                faulty_misp = alert.get_faulty_misp()
-                if ! faulty_misp.empty?
-                  skip_misp_servers = skip_misp_servers.concat(faulty_misp).uniq
-                end
-              end
-              if @data_malicious_domain.empty?            
-                # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
-                skip_domains.append(domain)
-              else
-                # We have found data in MISP about this domain -> we will report it to the right client
-                if ! all_alerts.include?(email_client)
-                  all_alerts[email_client] = {}
-                end
-                all_alerts[email_client][domain] = @data_malicious_domain
-                @@log_alerts.info(@data_malicious_domain)
-              end  
-            else
-              skip_domains.append(domain)
-            end
-          end
-        rescue Exception => e
-          raise Exception, TRIGGER_ERROR % [e:e]
-        end
+          ip_client = json_log["client"]
+          date = Time.parse(json_log["date"]).to_i
+          # If in addition of the domain, the resolved IP is provided, it will be analyzed
+          if json_log.keys.include?("answer")
+            study_ioc(@@bad_ips, json_log["answer"], "ip", ip_client, date)
+          end 
+          # Analyze if the domain is malicious
+          study_ioc(@@bad_domains, json_log["query"], "domain", ip_client, date)
       end
     end
-  return all_alerts
   end
 
   def run()
+    # The files to process are gouped so in case of failure at least some of them will be processed
     groups = get_groups()
     for group_of_files in groups
-      all_alerts = analize_domains(group_of_files)
-      if all_alerts.empty?
+      # Analyze all IOCs from the logs
+      analyze_all_iocs(group_of_files)
+      if @@alerts_found.empty?
         @@log_sys.debug("No alerts found!")
       else
-        # We will send an alert to each client (with an email on the config file) and to the general security contact
-        all_alerts.each do |email_client, client_data|
+        # We will send an alert to each client (with an email on the config file)
+        @@alerts_found.each do |email_client, client_data|
           email = Email.new()
           email.send_email(email_client, client_data) 
         end
@@ -116,3 +121,4 @@ class Trigger
     end
   end
 end
+

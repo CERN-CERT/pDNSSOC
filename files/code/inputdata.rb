@@ -42,3 +42,4 @@ module InputData
     return groups 
   end
 end
+
