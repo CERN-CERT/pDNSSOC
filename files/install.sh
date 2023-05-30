@@ -8,7 +8,9 @@ rm -f /usr/local/bin/pdnssoc/ 2> /dev/null
 rm -f /etc/pdnssoc/notification_email.html 2> /dev/null
 rm -f /etc/cron.hourly/pdnssoc_misp 2> /dev/null
 rm -f /etc/td-agent/td-agent.conf 2> /dev/null
+rm -f /usr/local/bin/pdnssoc/lookingback.sh 2> /dev/null
 sed '/pdnssoc\.rb/d' -i /etc/crontab
+sed '/lookingback/d' -i /etc/crontab
 
 echo "Installing system packages."
 # Packages installation
@@ -36,7 +38,7 @@ mkdir -p /usr/local/bin/pdnssoc/
 cp code/*.rb /usr/local/bin/pdnssoc/
 cp pdnssoc.conf /etc/pdnssoc/pdnssoc.conf
 cp pdnssoc.cron /etc/pdnssoc/pdnssoc.cron
-
+cp lookingback.sh /usr/local/bin/pdnssoc/
 echo "Installing pDNSSOC files."
 
 chmod +x /etc/pdnssoc/pdnssoc.cron
@@ -47,6 +49,8 @@ touch /etc/td-agent/misp_domains.txt
 ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
 
 echo  "*/15 * * * * root /opt/td-agent/bin/ruby /usr/local/bin/pdnssoc/pdnssoc.rb" >> /etc/crontab
+echo  "0 12 * * * * root /usr/local/bin/pdnssoc/lookingback.sh >> /etc/crontab" >> /etc/crontab
+
 
 # An empty line is required at the end of this file for a valid cron file.
 
