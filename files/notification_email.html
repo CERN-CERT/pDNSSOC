@@ -37,7 +37,7 @@
                 <tr>
                     <th>pDNSSOC client</th>
                     <th>First Occurrence</th>
-                    <th>Malicious domain</th>
+                    <th>IoCs detected</th>
                     <th>MISP event</th>
                     <th>Total # of IoCs</th>
                     <th>Publication</th>
@@ -45,20 +45,20 @@
                     <th>Comment</th>
                     <th>Tags</th>
                 </tr>
-                <% all_results.each do |domain, result_domain| %>
+                <% all_results.each do |ioc, data_ioc| %>
                     <tr>
-                        <% if result_domain["client_name"] == "" %>
-                            <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><%= result_domain["client_ip"] %></td>
+                        <% if data_ioc["client_name"] == "" %>
+                            <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><%= data_ioc["client_ip"] %></td>
                         <% else %>
-                            <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><%= result_domain["client_name"] %> (<%= result_domain["client_ip"] %>)</td>
+                            <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><%= data_ioc["client_name"] %> (<%= data_ioc["client_ip"] %>)</td>
                         <% end %>
-                        <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><%= Time.at(result_domain["first_occurrence"]).strftime(TIME_FORMAT_YMD) %></td>
-                        <td style="text-align: left;" rowspan="<%= result_domain["misp"].length %>"><a href="" target="_new"><%= result_domain["domain"] %></a></td>
-                        <% result_domain["misp"].each_with_index do |misp_event, idx_event| %>
+                        <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><%= Time.at(data_ioc["first_occurrence"]).strftime(TIME_FORMAT_YMD) %></td>
+                        <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><a href="" target="_new"><%= data_ioc["ioc_detected"] %></a></td>
+                        <% data_ioc["misp"].each_with_index do |misp_event, idx_event| %>
                             <% if idx_event > 0 %>
                                 <tr>
                             <% end %>
-                            <td style="text-align: left;"><a href="https://<%= misp_event["misp_domain"] %>/events/view/<%= misp_event["misp_id"] %>" target="_new"><%= misp_event["misp_info"] %></a></td>
+                            <td style="text-align: left;"><a href="https://<%= misp_event["misp_server"] %>/events/view/<%= misp_event["misp_id"] %>" target="_new"><%= misp_event["misp_info"] %></a></td>
                             <td style="text-align: left;"><%=  misp_event["num_iocs"] %></td>
                             <td style="text-align: left;"><%=  misp_event["publication"] %></td>
                             <td style="text-align: left;"><%=  misp_event["organisation"] %></td>
