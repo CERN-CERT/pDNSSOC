@@ -43,7 +43,7 @@ echo "Installing pDNSSOC files."
 
 chmod +x /etc/pdnssoc/pdnssoc.cron
 chmod +x /usr/local/bin/pdnssoc/pdnssoc.rb
-
+chmod +x /usr/local/bin/pdnssoc/lookingback.sh 
 
 touch /etc/td-agent/misp_domains.txt
 ln -s /etc/pdnssoc/pdnssoc.cron /etc/cron.hourly/pdnssoc_misp
