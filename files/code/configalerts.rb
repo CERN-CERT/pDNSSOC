@@ -29,7 +29,8 @@ module ConfigAlerts
     # Template HTML of the email
     f = File.open(PATH_HTML, "r") 
     f.each_line do |line| html_data += line end
-    raise TypeError, "html_data expected an String, got #{html_data.class.name}" unless html_data.kind_of?(String)
+    raise TypeError, "html_data expected an String, got #{html_data.class.name}"
+      unless html_data.kind_of?(String)
     return html_data
   end 
 
@@ -40,19 +41,33 @@ module ConfigAlerts
     alerts_config = config_data["alerts_path"]
     email_config = config_data["email"]
     pdns_config = config_data["pdns_client"]
+    opensearch_config = config_data["opensearch"]
+
     # Check if they all have the expected format
-    bool_conf = (misp_config.kind_of?(Array) and alerts_config.kind_of?(String) and email_config.kind_of?(Hash) and pdns_config.kind_of?(Hash))
+    bool_conf = (misp_config.kind_of?(Array)
+      and alerts_config.kind_of?(String)
+      and email_config.kind_of?(Hash)
+      and pdns_config.kind_of?(Hash)
+      and opensearch_config.kind_of?(Hash))
+
     # Check if all the required info is present
     if bool_conf
       misp_subconf = params_to_check(misp_config, ['domain', 'api_key', 'parameter'])
-      email_subconf = params_to_check(email_config, ['from', 'to', 'subject', 'server', 'port'])
+      email_subconf = params_to_check(email_config, ['enable', 'from', 'to', 'subject', 'server', 'port'])
+      opensearch_subconf = params_to_check(opensearch_config, ['enable', 'server', 'username', 'password'])
     end
+
     # If some field is missing or empty the code breaks
-    if ! (bool_conf and misp_subconf and email_subconf)
+    if ! (bool_conf
+      and misp_subconf
+      and email_subconf
+      and opensearch_subconf)
+
       @@log_sys.error(CONFIGFILE) #+ "Backtrace: " + e.backtrace.join(" / "))
       raise (error_message)  
     end
-    return misp_config, alerts_config, email_config, pdns_config 
+
+    return misp_config, alerts_config, email_config, pdns_config, opensearch_config
   end
 
   def params_to_check(configuration, params)

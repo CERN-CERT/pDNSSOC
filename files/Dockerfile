@@ -7,7 +7,7 @@ RUN td-agent-gem install fluent-plugin-filter-list --force
 
 RUN gem install parseconfig
 RUN gem install misp
-
+RUN gem install opensearch-ruby
 
 RUN mkdir -p /etc/pdnssoc/
 RUN touch /etc/td-agent/misp_domains.txt
