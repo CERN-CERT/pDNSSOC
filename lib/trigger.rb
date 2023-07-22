@@ -56,17 +56,17 @@ class Trigger
             # We don't have information so we will query MISP
             alert = Alert.new()                
             @result_ioc = alert.parse_log(ioc_detected, type_ioc, date, ip_client)
-          end
-          if @result_ioc.empty?            
-            # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
-            skip_iocs.append(ioc_detected)
-          else
-            # We have found data in MISP about this domain -> we will report it to the right client
-            if ! @@alerts_found.include?(email_client)
-              @@alerts_found[email_client] = {}
+            if @result_ioc.empty?
+              # Although it is a malicious domain it doesn't have any data in MISP -> skip next time
+              skip_iocs.append(ioc_detected)
+            else
+              # We have found data in MISP about this domain -> we will report it to the right client
+              if ! @@alerts_found.include?(email_client)
+                @@alerts_found[email_client] = {}
+              end
+              @@alerts_found[email_client][ioc_detected] = @result_ioc
+              @@log_alerts.info(@result_ioc)
             end
-            @@alerts_found[email_client][ioc_detected] = @result_ioc
-            @@log_alerts.info(@result_ioc)
           end
         else
           skip_iocs.append(ioc_detected)
