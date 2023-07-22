@@ -16,7 +16,7 @@ module ConfigAlerts
     @@log_sys = Logger.new(PATH_LOG + FILENAME_LOG_SYS, 'daily')
     @@log_sys.formatter = proc do |severity, datetime, progname, msg| "#{datetime}, #{severity}: #{msg} #{progname} \n" end
     # Open config files
-    @@misp_config, @@alerts_config, @@email_config, @@pdns_config = init_config()
+    @@misp_config, @@alerts_config, @@email_config, @@pdns_config, @@opensearch_config = init_config()
     # Get the list of bad domains
     @@bad_domains = File.read(PATH_MISP_D)
     @@bad_ips = File.read(PATH_MISP_IP)
@@ -29,8 +29,7 @@ module ConfigAlerts
     # Template HTML of the email
     f = File.open(PATH_HTML, "r") 
     f.each_line do |line| html_data += line end
-    raise TypeError, "html_data expected an String, got #{html_data.class.name}"
-      unless html_data.kind_of?(String)
+    raise TypeError, "html_data expected an String, got #{html_data.class.name}" unless html_data.kind_of?(String)
     return html_data
   end 
 
@@ -44,11 +43,7 @@ module ConfigAlerts
     opensearch_config = config_data["opensearch"]
 
     # Check if they all have the expected format
-    bool_conf = (misp_config.kind_of?(Array)
-      and alerts_config.kind_of?(String)
-      and email_config.kind_of?(Hash)
-      and pdns_config.kind_of?(Hash)
-      and opensearch_config.kind_of?(Hash))
+    bool_conf = (misp_config.kind_of?(Array) and alerts_config.kind_of?(String) and email_config.kind_of?(Hash) and pdns_config.kind_of?(Hash) and opensearch_config.kind_of?(Hash))
 
     # Check if all the required info is present
     if bool_conf
@@ -58,10 +53,7 @@ module ConfigAlerts
     end
 
     # If some field is missing or empty the code breaks
-    if ! (bool_conf
-      and misp_subconf
-      and email_subconf
-      and opensearch_subconf)
+    if ! (bool_conf and misp_subconf and email_subconf and opensearch_subconf)
 
       @@log_sys.error(CONFIGFILE) #+ "Backtrace: " + e.backtrace.join(" / "))
       raise (error_message)  

@@ -1,4 +1,6 @@
 require 'opensearch'
+require_relative 'constants'
+require 'time'
 
 class Opensearch
   include ConfigAlerts
@@ -7,7 +9,7 @@ class Opensearch
 
   def send_alert(results)
     begin
-      client = Opensearch::Client.new(
+      client = OpenSearch::Client.new(
         url: @@opensearch_config["server"],
         user: @@opensearch_config["username"],
         password: @@opensearch_config["password"],
@@ -23,7 +25,7 @@ class Opensearch
             'src_ip': data_ioc["client_ip"],
             'ioc_detected': data_ioc["ioc_detected"],
             'misp': {
-              'link': misp_event["misp_server"] + "/events/view/" + misp_event["misp_id"],
+              'link': "https://" + misp_event["misp_server"] + "/events/view/" + misp_event["misp_id"],
               'misp_info': misp_event["misp_info"],
               'num_iocs': misp_event["num_iocs"],
               'publication': misp_event["publication"],
@@ -41,4 +43,5 @@ class Opensearch
         end
       end
     end
+  end
 end

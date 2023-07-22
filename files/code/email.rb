@@ -28,7 +28,7 @@ class Email
       MESSAGE_END
       
       # Send the email
-      Net::SMTP.start(@@email_config["server"], @@email_config["port"]) do |smtp|
+      Net::SMTP.start(@@email_config["server"], @@email_config["port"], tls_verify: false) do |smtp|
         smtp.send_message message, @@email_config["from"], email_to end
       
     rescue Exception => e

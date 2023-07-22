@@ -1,6 +1,7 @@
 require_relative 'configalerts'
 require_relative 'email'
 require_relative 'alerts'
+require_relative 'opensearch'
 require_relative 'constants'
 require_relative 'inputdata'
 require "time"
@@ -113,7 +114,9 @@ class Trigger
         # We will send an alert to each client (with an email on the config file)
         @@alerts_found.each do |email_client, client_data|
           email = Email.new()
-          email.send_email(email_client, client_data) 
+          email.send_email(email_client, client_data)
+          opensearch = Opensearch.new()
+          opensearch.send_alert(client_data)
         end
       end
       # If the send_email is not successful the logs will not be deleted
@@ -121,4 +124,5 @@ class Trigger
     end
   end
 end
+
 
