@@ -20,7 +20,8 @@ class Opensearch
       results.each do |ioc, data_ioc|
         data_ioc["misp"].each_with_index do |misp_event, idx_event|
           document = {
-            '@timestamp': Time.at(data_ioc["first_occurrence"]).strftime(TIME_FORMAT_YMD),
+            # '@timestamp': Time.at(data_ioc["first_occurrence"]).strftime(TIME_FORMAT_YMD),
+            '@timestamp': Time.now().strftime(TIME_FORMAT_YMD),
             'source': 'pdnssoc',
             'src_ip': data_ioc["client_ip"],
             'ioc_detected': data_ioc["ioc_detected"],
@@ -40,6 +41,10 @@ class Opensearch
             body: document,
             refresh: true
           )
+          puts response
+          rescue Exception => e
+            @@log_sys.error("OpenSearch error: " + e.message)
+            raise Exception, "OpenSearch error: " + e.message
         end
       end
     end
