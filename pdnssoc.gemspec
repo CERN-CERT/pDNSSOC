@@ -20,7 +20,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'parseconfig'
   spec.add_runtime_dependency 'misp'
   spec.add_runtime_dependency 'fluent-plugin-filter-list'
-
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'bundler'
 
   spec.metadata['source_code_uri'] = 'https://github.com/CERN-CERT/pDNSSOC'
   spec.metadata['changelog_uri']   = 'https://github.com/CERN-CERT/pDNSSOC/blob/master/CHANGELOG.md'
