@@ -1,10 +1,16 @@
+
+file_path = File.expand_path(__FILE__)
+lib_path = File.dirname(file_path)
+common_path = File.dirname(directory_path)
+
 module ConstantsConfig
     # If the env variables are not defined, use the default values
     PATH_LOG = ENV['PATH_LOG'] || "/var/log/td-agent/"
-    PATH_PDNS_CONF = ENV['PATH_PDNS_CONF'] || "/etc/pdnssoc/pdnssoc.conf"
-    PATH_MISP_D = ENV['PATH_MISP_D'] || "/etc/td-agent/misp_domains.txt"
-    PATH_MISP_IP = ENV['PATH_MISP_D'] || "/etc/td-agent/misp_ips.txt"
-    PATH_HTML = ENV['PATH_HTML'] || "/etc/pdnssoc/notification_email.html"
+    PATH_TDAGENT = "/etc/td-agent/"
+    PATH_PDNS_CONF = ENV['PATH_PDNS_CONF'] || File.join(common_path, "config/pdnssoc.conf")
+    PATH_MISP_D = ENV['PATH_MISP_D'] || File.join(PATH_TDAGENT, "misp_domains.txt")
+    PATH_MISP_IP = ENV['PATH_MISP_D'] || File.join(PATH_TDAGENT, "misp_ips.txt")
+    PATH_HTML = ENV['PATH_HTML'] || File.join(common_path, "config/notification_email.html")
     FILENAME_LOG_ALERT = ENV['FILENAME_LOG_ALERT'] || "alerts.log"
     FILENAME_LOG_SYS = ENV['FILENAME_LOG_SYS'] || "pdnssoc_sys.log"
 end
@@ -31,7 +37,7 @@ end
 
 module ConstantsData
     RGX_FILE_TIME = "/\d{8}-\d{4}/"
-    PATH_ALERTS = '/var/log/td-agent/pdnssoc-alerts/'
+    PATH_ALERTS = PATH_LOG + 'pdnssoc-alerts/'
     RGX_FILE_REF = 'pdnssoc-buffer.*.log'
     GROUP_SIZE = 5 * 1024 * 1024
 end

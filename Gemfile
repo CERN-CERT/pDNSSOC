@@ -7,6 +7,7 @@ gemspec
 gem 'parseconfig'
 gem 'misp'
 gem 'fluent-plugin-filter-list'
+gem 'whenever', require: false
 
 group :development do
   gem 'rake'
