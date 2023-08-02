@@ -3,6 +3,7 @@ require 'fileutils'
 
 module InputData
   include ConstantsData
+  include ConstantsConfig
 
   def get_groups()
     # Get a list of all files in the directory

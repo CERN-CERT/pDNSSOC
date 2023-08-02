@@ -1,11 +1,11 @@
 
-file_path = File.expand_path(__FILE__)
-lib_path = File.dirname(file_path)
-common_path = File.dirname(directory_path)
-
 module ConstantsConfig
+    file_path = File.expand_path(__FILE__)
+    lib_path = File.dirname(file_path)
+    common_path = File.dirname(lib_path)
     # If the env variables are not defined, use the default values
     PATH_LOG = ENV['PATH_LOG'] || "/var/log/td-agent/"
+    PATH_ALERTS = PATH_LOG + 'pdnssoc-alerts/'
     PATH_TDAGENT = "/etc/td-agent/"
     PATH_PDNS_CONF = ENV['PATH_PDNS_CONF'] || File.join(common_path, "config/pdnssoc.conf")
     PATH_MISP_D = ENV['PATH_MISP_D'] || File.join(PATH_TDAGENT, "misp_domains.txt")
@@ -37,7 +37,6 @@ end
 
 module ConstantsData
     RGX_FILE_TIME = "/\d{8}-\d{4}/"
-    PATH_ALERTS = PATH_LOG + 'pdnssoc-alerts/'
     RGX_FILE_REF = 'pdnssoc-buffer.*.log'
     GROUP_SIZE = 5 * 1024 * 1024
 end

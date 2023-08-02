@@ -5,7 +5,7 @@
 # Downloading MISP events
 
 pull_misp_data(){
-jq  --raw-output '.misp_servers[] | "\(.api_key)|\(.domain)|\(.'$1')"' ../config/pdnssoc.conf |
+jq  --raw-output '.misp_servers[] | "\(.api_key)|\(.domain)|\(.'$1')"' /etc/pdnssoc/pdnssoc.conf |
 while IFS="|" read -r api_key domain parameter; do
          printf -v mycurl 'curl -k -qsS --header "Authorization: %s" "%s%s"\n' "$api_key" "https://$domain/" "$parameter"
          raw_data=$( eval ${mycurl})

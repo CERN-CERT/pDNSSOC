@@ -22,6 +22,7 @@ namespace :rake_install do
       td_agent_file = File.join(pdnssoc_workdir, 'config', 'td-agent.conf')
       FileUtils.cp(td_agent_file, '/etc/td-agent/td-agent.conf')
     end
+    system('td-agent-gem install parseconfig;td-agent-gem install misp')
     # Create the logging and fluentd directories
     FileUtils.mkdir_p('/var/log/td-agent/')
     dir_tdagent = '/etc/td-agent/'
@@ -29,6 +30,9 @@ namespace :rake_install do
     FileUtils.chown('td-agent', 'td-agent', dir_tdagent)
     FileUtils.touch('/etc/td-agent/misp_domains.txt')
     FileUtils.touch('/etc/td-agent/misp_ips.txt')
+    # Create pdnssoc directory
+    FileUtils.mkdir_p('/etc/pdnssoc/')
+    FileUtils.ln_s(File.join(pdnssoc_workdir, 'config', 'pdnssoc.conf'), '/etc/pdnssoc/', force: true)
     # Add the cronjobs that will keep pdnssoc running
     schedule_file = File.join(pdnssoc_workdir, 'config', 'schedule.rb')
     command = "whenever --update-crontab --load-file #{schedule_file}"
