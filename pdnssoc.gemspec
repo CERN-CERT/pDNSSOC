@@ -1,7 +1,7 @@
 
 Gem::Specification.new do |spec|
   spec.name                  = 'pdnssoc'
-  spec.version               = '0.1.2'
+  spec.version               = '0.1.3'
   spec.authors               = ['Pau Cutrina', 'Romain Wartel', 'Christos Arvanitis']
   spec.email                 = ['admin@safer-trust.org']
   spec.required_ruby_version = '>= 2.5.0'

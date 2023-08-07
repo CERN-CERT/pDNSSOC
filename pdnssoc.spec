@@ -1,6 +1,6 @@
 # pdnssoc.spec
 %define rbname pdnssoc
-%define version 0.1.2
+%define version 0.1.3
 %define release 1
 
 Name:           pdnssoc
@@ -12,8 +12,7 @@ URL:            https://github.com/CERN-CERT/pDNSSOC
 Group:          Applications/System
 Packager:       SAFER <admin@safer-trust.org>
 BuildRoot:      %{_tmppath}/%{name}-root
-Source0:        pdnssoc-%{version}.gem
-Source1:        http://gems.rubyforge.org/gems/%{name}-%{version}.gem
+Source0:        https://rubygems.org/downloads/pdnssoc-%{version}.gem
 Provides:       ruby(Pdnssoc) = %{version}
 
 # Dependencies for the RPM package
@@ -57,7 +56,7 @@ Documentation for %{name}
 %install
 %{__rm} -rf %{buildroot}
 mkdir -p %{gembuilddir}
-gem install --install-dir %{gembuilddir} --force %{SOURCE0}
+gem install --install-dir %{gembuilddir} --force pdnssoc
 
 # Install fluentd
 td-agent-gem install parseconfig
