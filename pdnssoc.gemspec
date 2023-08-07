@@ -1,8 +1,7 @@
-require 'rake'
 
 Gem::Specification.new do |spec|
   spec.name                  = 'pdnssoc'
-  spec.version               = '0.1.0'
+  spec.version               = '0.1.2'
   spec.authors               = ['Pau Cutrina', 'Romain Wartel', 'Christos Arvanitis']
   spec.email                 = ['admin@safer-trust.org']
   spec.required_ruby_version = '>= 2.5.0'
@@ -13,15 +12,15 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://github.com/CERN-CERT/pDNSSOC/'
   spec.license     = 'MIT'
 
-  spec.files         = Dir["bin/**/*", "lib/**/*", "data/**/*", "config/**/*", "cron/**/*"]
+  spec.files         = Dir["lib/**/*", "config/**/*", "timers/**/*"]
   
-  spec.executables = spec.files.grep(%r{^bin/}).map { |f| File.basename(f) } 
+  # spec.executables = spec.files.grep(%r{^bin/}).map { |f| File.basename(f) } 
 
-  spec.add_runtime_dependency 'parseconfig'
-  spec.add_runtime_dependency 'misp'
-  spec.add_runtime_dependency 'fluent-plugin-filter-list'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'bundler'
+  # spec.add_runtime_dependency 'parseconfig'
+  # spec.add_runtime_dependency 'misp'
+  # spec.add_runtime_dependency 'fluent-plugin-filter-list'
+  # spec.add_development_dependency 'rake'
+  # spec.add_development_dependency 'bundler'
 
   spec.metadata['source_code_uri'] = 'https://github.com/CERN-CERT/pDNSSOC'
   spec.metadata['changelog_uri']   = 'https://github.com/CERN-CERT/pDNSSOC/blob/master/CHANGELOG.md'

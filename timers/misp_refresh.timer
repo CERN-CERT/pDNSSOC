@@ -1,0 +1,9 @@
+[Unit]
+Description=Run misp_refresh.sh every hour      
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

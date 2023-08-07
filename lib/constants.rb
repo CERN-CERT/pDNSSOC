@@ -7,10 +7,10 @@ module ConstantsConfig
     PATH_LOG = ENV['PATH_LOG'] || "/var/log/td-agent/"
     PATH_ALERTS = PATH_LOG + 'pdnssoc-alerts/'
     PATH_TDAGENT = "/etc/td-agent/"
-    PATH_PDNS_CONF = ENV['PATH_PDNS_CONF'] || File.join(common_path, "config/pdnssoc.conf")
+    PATH_PDNS_CONF = ENV['PATH_PDNS_CONF'] || "/etc/pdnssoc/pdnssoc.conf"
     PATH_MISP_D = ENV['PATH_MISP_D'] || File.join(PATH_TDAGENT, "misp_domains.txt")
     PATH_MISP_IP = ENV['PATH_MISP_D'] || File.join(PATH_TDAGENT, "misp_ips.txt")
-    PATH_HTML = ENV['PATH_HTML'] || File.join(common_path, "config/notification_email.html")
+    PATH_HTML = ENV['PATH_HTML'] || "/etc/pdnssoc/notification_email.html"
     FILENAME_LOG_ALERT = ENV['FILENAME_LOG_ALERT'] || "alerts.log"
     FILENAME_LOG_SYS = ENV['FILENAME_LOG_SYS'] || "pdnssoc_sys.log"
 end
