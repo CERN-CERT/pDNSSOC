@@ -93,9 +93,11 @@ touch  %{pdnssoc_config}/misp_ips.txt
 %defattr(-, root, root)
 
 # Configuration files
-%config(noreplace) /etc/pdnssoc/pdnssoc.conf
-%config(noreplace) /etc/pdnssoc/td-agent.conf
-/etc/pdnssoc/notification_email.html
+%config(noreplace) %{pdnssoc_config_root}/pdnssoc.conf
+%config(noreplace) %{pdnssoc_config_root}/td-agent.conf
+%{pdnssoc_config_root}/notification_email.html
+%{pdnssoc_config_root}/misp_domains.txt
+%{pdnssoc_config_root}/misp_ips.txt
 
 # pDNSSOC code
 %{pdnssoc_code_root}/*
