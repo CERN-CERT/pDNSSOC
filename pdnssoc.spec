@@ -85,6 +85,10 @@ mkdir %{pdnssoc_config}/timers
 cp -a  %{gemworkdir}/timers/*.timer %{pdnssoc_config}/timers
 cp -a %{gemworkdir}/timers/*.service %{timerdir}/
 
+# Creating misp_ files
+touch  %{pdnssoc_config}/misp_domains.txt
+touch  %{pdnssoc_config}/misp_ips.txt
+
 %files
 %defattr(-, root, root)
 
