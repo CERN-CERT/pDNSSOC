@@ -1,142 +1,123 @@
-# pdnssoc.spec
-%define rbname pdnssoc
-%define version 0.1.3
-%define release 1
+%global gem_name pdnssoc
 
-Name:           pdnssoc
-Version:        %{version}
-Release:        %{release}
-Summary:        pDNSSOC RPM Package
-License:        MIT
-URL:            https://github.com/CERN-CERT/pDNSSOC
-Group:          Applications/System
-Packager:       SAFER <admin@safer-trust.org>
-BuildRoot:      %{_tmppath}/%{name}-root
-Source0:        https://rubygems.org/downloads/pdnssoc-%{version}.gem
-Provides:       ruby(Pdnssoc) = %{version}
-
-# Dependencies for the RPM package
-Requires:       ruby >= 2.5.0
-Requires:       td-agent
-
-# Directiories for gem
-%define gemdir /usr/local/share/gems
-%define gembuilddir %{buildroot}%{gemdir}
-%define gemworkdir %{gembuilddir}/gems/pdnssoc-%{version}
-
-# Directories for pdnssoc
-%define pdnssoc_code_root /usr/local/bin/pdnssoc
-%define pdnssoc_code %{buildroot}%{pdnssoc_code_root}
-%define pdnssoc_config_root /etc/pdnssoc
-%define pdnssoc_config %{buildroot}%{pdnssoc_config_root}
-
-# Directories for timers
-%define timerdir_root /usr/lib/systemd/system
-%define timerdir %{buildroot}%{timerdir_root}
-
-# Other
-%define debug_package %{nil}
+Name: rubygem-%{gem_name}
+Version: 0.1.4
+Release: 1%{?dist}
+Summary: pDNS correlation with MISP
+License: MIT
+URL: https://github.com/CERN-CERT/pDNSSOC/
+Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+BuildRequires: ruby(release)
+BuildRequires: rubygems-devel
+BuildRequires: ruby >= 2.5.0
+BuildRequires: td-agent
+BuildRequires: systemd-rpm-macros
+BuildArch: noarch
 
 %description
-This package contains the necessary files and configurations for pDNSSOC.
+pDNS correlation with MISP.
+
 
 %package doc
 Summary: Documentation for %{name}
-Group: Documentation
 Requires: %{name} = %{version}-%{release}
+BuildArch: noarch
 
 %description doc
-Documentation for %{name}
+Documentation for %{name}.
 
 %prep
-%setup -T -c
+%setup -q -n %{gem_name}-%{version}
 
 %build
+# Create the gem as gem install only works on a gem file
+gem build ../%{gem_name}-%{version}.gemspec
+
+# %%gem_install compiles any C extensions and installs the gem into ./%%gem_dir
+# by default, so that we can move it into the buildroot in %%install
+%gem_install
 
 %install
-%{__rm} -rf %{buildroot}
-mkdir -p %{gembuilddir}
-gem install --install-dir %{gembuilddir} --force pdnssoc
+mkdir -p %{buildroot}%{gem_dir}
+cp -a .%{gem_dir}/* \
+        %{buildroot}%{gem_dir}/
 
-# Install fluentd
+# Install fluentd gems
 td-agent-gem install parseconfig
 td-agent-gem install misp
 td-agent-gem install fluent-plugin-filter-list --force
 
-# Create pdnssoc directory in the build root
-mkdir -p %{pdnssoc_config}
-mkdir -p %{pdnssoc_code}
-mkdir -p %{timerdir}
+# Installing files in /etc/pdnssoc
+install -d %{buildroot}%{_sysconfdir}
+install -d %{buildroot}%{_sysconfdir}/pdnssoc
+touch  %{buildroot}%{_sysconfdir}/pdnssoc/misp_ips.txt
+touch  %{buildroot}%{_sysconfdir}/pdnssoc/misp_domains.txt
+install -p -m0644 config/pdnssoc.conf %{buildroot}%{_sysconfdir}/pdnssoc/pdnssoc.conf
+install -p -m0644 config/td-agent.conf.template %{buildroot}%{_sysconfdir}/pdnssoc/td-agent.conf.template
+install -p -m0644 config/notification_email.html %{buildroot}%{_sysconfdir}/pdnssoc/notification_email.html
 
-# Install the configuration files directly to /etc/pdnssoc/
-install -D -m 0644 %{gemworkdir}/config/pdnssoc.conf %{pdnssoc_config}/pdnssoc.conf
+# Install pdnssoc code
+mkdir -p %{buildroot}/usr/local/bin/pdnssoc
+cp -a  lib/* %{buildroot}/usr/local/bin/pdnssoc
 
-# Find and install notification_email.html and td-agent.conf
-install -D -m 0644 %{gemworkdir}/config/notification_email.html %{pdnssoc_config}/notification_email.html
-install -D -m 0644 -o td-agent -g td-agent %{gemworkdir}/config/td-agent.conf %{pdnssoc_config}/td-agent.conf
+# Installing timers
+install -d %{buildroot}%{_unitdir}
+install -p -m0644 timers/* %{buildroot}%{_unitdir}/
 
-# Code
-cp -a  %{gemworkdir}/lib/* %{pdnssoc_code}/
-chmod 755 %{pdnssoc_code}/lookingback.sh
-chmod 755 %{pdnssoc_code}/misp_refresh.sh
-
-# Timers definition
-mkdir %{pdnssoc_config}/timers
-cp -a  %{gemworkdir}/timers/*.timer %{pdnssoc_config}/timers
-cp -a %{gemworkdir}/timers/*.service %{timerdir}/
-
-# Creating misp_ files
-touch  %{pdnssoc_config}/misp_domains.txt
-touch  %{pdnssoc_config}/misp_ips.txt
+%check
+pushd .%{gem_instdir}
+# Run the test suite.
+popd
 
 %files
-%defattr(-, root, root)
-
-# Configuration files
-%config(noreplace) %{pdnssoc_config_root}/pdnssoc.conf
-%config(noreplace) %{pdnssoc_config_root}/td-agent.conf
-%{pdnssoc_config_root}/notification_email.html
-%{pdnssoc_config_root}/misp_domains.txt
-%{pdnssoc_config_root}/misp_ips.txt
-
-# pDNSSOC code
-%{pdnssoc_code_root}/*
-
+%dir %{gem_instdir}
+%{gem_libdir}
+%{gem_instdir}/config
+%{gem_instdir}/timers
+%{gem_instdir}/lib
+%exclude %{gem_cache}
+%{gem_spec}
 # Timers
-%{pdnssoc_config_root}/timers/pdnssoc.timer
-%{timerdir_root}/pdnssoc.service
-%{pdnssoc_config_root}/timers/lookingback.timer
-%{timerdir_root}/lookingback.service
-%{pdnssoc_config_root}/timers/misp_refresh.timer
-%{timerdir_root}/misp_refresh.service
+%{_unitdir}/pdnssoc.timer
+%{_unitdir}/pdnssoc.service
+%{_unitdir}/lookingback.timer
+%{_unitdir}/lookingback.service
+%{_unitdir}/misp_refresh.service
+%{_unitdir}/misp_refresh.timer
+# Main pdnssoc directory
+%dir %{_sysconfdir}/pdnssoc
+%config(noreplace) %{_sysconfdir}/pdnssoc/misp_ips.txt
+%config(noreplace) %{_sysconfdir}/pdnssoc/misp_domains.txt
+%config(noreplace) %{_sysconfdir}/pdnssoc/pdnssoc.conf
+%config(noreplace) %{_sysconfdir}/pdnssoc/td-agent.conf.template
+%{_sysconfdir}/pdnssoc/notification_email.html
 
-# GEM files
-%{gemdir}/gems/pdnssoc-%{version}/*
-%{gemdir}/cache/pdnssoc-%{version}.gem
-%{gemdir}/specifications/pdnssoc-%{version}.gemspec
+# Code of pdnssoc
+%dir /usr/local/bin/pdnssoc
+
+%files doc
+%doc %{gem_docdir}
 
 %post
-# Symbolic link with the timer so the user can easily change the execution time
-ln -sf %{pdnssoc_config_root}/timers/pdnssoc.timer %{timerdir_root}/pdnssoc.timer
-ln -sf %{pdnssoc_config_root}/timers/lookingback.timer %{timerdir_root}/lookingback.timer
-ln -sf %{pdnssoc_config_root}/timers/misp_refresh.timer %{timerdir_root}/misp_refresh.timer
-
-# Enable the timers
-systemctl daemon-reload
-systemctl enable pdnssoc.timer lookingback.timer misp_refresh.timer
-systemctl start pdnssoc.timer lookingback.timer misp_refresh.timer
-
+# Enable Timers
+%systemd_post pdnssoc.service pdnssoc.timer
+%systemd_post lookingback.service lookingback.timer
+%systemd_post misp_refresh.service misp_refresh.timer
 # Start Fluentd
 systemctl restart td-agent.service
 
-%postun
-if [ ! "$1" -ge "1" ] ; then
-    rm -rf /etc/pdnssoc/
-fi
+%preun
+%systemd_preun pdnssoc.service pdnssoc.timer
+%systemd_preun lookingback.service lookingback.timer
+%systemd_preun misp_refresh.service misp_refresh.timer
 
-%clean
-%{__rm} -rf %{buildroot}
+%postun
+%systemd_postun_with_restart pdnssoc.service pdnssoc.timer
+%systemd_postun_with_restart lookingback.service lookingback.timer
+%systemd_postun_with_restart misp_refresh.service misp_refresh.timer
 
 %changelog
+* Mon Aug 10 2023  Pau Cutrina, Romain Wartel, Christos Arvanitis <admin@safer-trust.org> - 1.0-1
+- Changes to make it more GEM standard
 * Mon Aug 07 2023 Pau Cutrina, Romain Wartel, Christos Arvanitis <admin@safer-trust.org> - 1.0-1
 - Initial RPM package

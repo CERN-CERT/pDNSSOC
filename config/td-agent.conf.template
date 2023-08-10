@@ -66,6 +66,9 @@
   @type forward
   port 5555
   tag pdnssocdata
+  # tls true
+  # tls_cert_path /path/to/fluentd.crt
+  # tls_private_key_path /path/to/fluentd.key
   <parse>
         @type regexp
     expression /{"date":"(?<date>.*)","client":"(?<client>.*)","query":"(?<query>.*)"}/
@@ -112,6 +115,8 @@
         # <server>
         #   host upstream-pdnssoc.domain.edu
         #   port 5555
+        #   tls true
+        #   tls_cert_path /path/to/fluentd.pem
         # </server>
         #</store>
         #######################
