@@ -110,16 +110,32 @@ Directory structure:
 /etc/pdnssoc/
 ├── notification_email.html
 ├── pdnssoc.conf
-├── td-agent.conf.template
-└── timers
-    ├── lookingback.timer
-    ├── misp_refresh.timer
-    └── pdnssoc.timer
+└── td-agent.conf.template
+
 /etc/td-agent/
 ├── misp_domains.txt
 ├── misp_ips.txt
 ├── plugin
 └── td-agent.conf -> /etc/pdnssoc/td-agent.conf
+
+/var/log/td-agent/
+...
+├── queries/
+├── pdnssoc-alerts
+│   └──pdnssoc-buffer/
+├── alerts.log
+├── pdnssoc_sys.log
+└── td-agent.log
+
+/usr/lib/systemd/system/
+...
+├── lookingback.service
+├── lookingback.timer
+├── misp_refresh.service
+├── misp_refresh.timer
+├── pdnssoc.service
+└── pdnssoc.timer
+
 ```
 
 ### Configuration file
