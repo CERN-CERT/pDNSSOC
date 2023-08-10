@@ -74,7 +74,6 @@ popd
 %{gem_libdir}
 %{gem_instdir}/config
 %{gem_instdir}/timers
-%{gem_instdir}/lib
 %exclude %{gem_cache}
 %{gem_spec}
 # Timers
@@ -94,27 +93,26 @@ popd
 
 # Code of pdnssoc
 %dir /usr/local/bin/pdnssoc
+/usr/local/bin/pdnssoc/*
 
 %files doc
 %doc %{gem_docdir}
 
 %post
 # Enable Timers
-%systemd_post pdnssoc.service pdnssoc.timer
-%systemd_post lookingback.service lookingback.timer
-%systemd_post misp_refresh.service misp_refresh.timer
-# Start Fluentd
-systemctl restart td-agent.service
+%systemd_post pdnssoc.service
+%systemd_post lookingback.service
+%systemd_post misp_refresh.service
 
 %preun
-%systemd_preun pdnssoc.service pdnssoc.timer
-%systemd_preun lookingback.service lookingback.timer
-%systemd_preun misp_refresh.service misp_refresh.timer
+%systemd_preun pdnssoc.service
+%systemd_preun lookingback.service
+%systemd_preun misp_refresh.service
 
 %postun
-%systemd_postun_with_restart pdnssoc.service pdnssoc.timer
-%systemd_postun_with_restart lookingback.service lookingback.timer
-%systemd_postun_with_restart misp_refresh.service misp_refresh.timer
+%systemd_postun_with_restart pdnssoc.service
+%systemd_postun_with_restart lookingback.service
+%systemd_postun_with_restart misp_refresh.service
 
 %changelog
 * Mon Aug 10 2023  Pau Cutrina, Romain Wartel, Christos Arvanitis <admin@safer-trust.org> - 1.0-1
