@@ -80,7 +80,7 @@ curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
 ```
 4. Download the gem file:
 ```
-wget https://rubygems.org/downloads/pdnssoc-VERSION.gem
+curl -o /path/to/download/pdnssoc-VERSION.gem https://rubygems.org/downloads/pdnssoc-VERSION.gem
 ```
 5. Install the rpm:
 ```
