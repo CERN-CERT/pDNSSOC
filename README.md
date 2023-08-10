@@ -84,7 +84,7 @@ wget https://rubygems.org/downloads/pdnssoc-VERSION.gem
 ```
 5. Install the rpm:
 ```
-rpm -i pdnssoc-VERSION-RELEASE.x86_64.rpm
+rpm -i pdnssoc-VERSION-RELEASE.noarch.rpm
 ```
 6. Populate the configuration in `/etc/pdnssoc/pdnssoc.conf` with the MISP server(s) details and the alert emails details
 7. Use the fluentd config template in `/etc/pdnssoc/td-agent.conf.template` to overwrite or adapt `/etc/td-agent/td-agent.conf`
