@@ -70,103 +70,51 @@ pDNSSOC operators are typically security teams at NREN CERTs, e-infratructure se
 ### VM deployment
 
 1. Get a fresh CENTOS 9 or AlmaLinux 9 (or any binary-compatible system with Red Hat Enterprise Linux 9) VM
-2. Execute the install script, for example:
+2. Install the needed libraries:
 ```
- curl -L https://raw.githubusercontent.com/CERN-CERT/pDNSSOC/main/files/install.sh  | sh
+yum install gem jq ruby-devel
 ```
-3. Populate the configuration in `/etc/pdnssoc/pdnssoc.conf` with the MISP server(s) details and the alert emails details
-4. Do an initial load of malicious domains from MISP:
+3. Download and install td-agent (fluentd):
 ```
-/etc/pdnssoc/pdnssoc.cron 
+curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
+```
+4. Install the rpm:
+```
+rpm -i pdnssoc-VERSION-RELEASE.x86_64.rpm
+```
+5. Populate the configuration in `/etc/pdnssoc/pdnssoc.conf` with the MISP server(s) details and the alert emails details
+6. Use the fluentd config template in `/etc/pdnssoc/td-agent.conf.template` to overwrite or adapt `/etc/td-agent/td-agent.conf`
+7. Include the appropriate firewall rules in order to accept incoming traffic:
+```
+firewall-cmd --zone=public --add-port=5140-5143/tcp --permanent
+firewall-cmd --zone=public --add-port=5555/tcp --permanent
+firewall-cmd --reload
+```
+5. Do an initial load of malicious domains from MISP:
+```
+/bin/bash /usr/local/bin/pdnssoc/misp_refresh.sh
 systemctl restart td-agent
 ```
-5. That's it!
+5. That's it! You can do the following to check that the system is well configured:
+```
+sudo systemctl list-timers
+```
 
 Directory structure:
 ```
-/etc/pdnssoc/pdnssoc.conf
-/etc/pdnssoc/notification_email.html
-/etc/td-agent/misp_domains.txt
-/etc/td-agent/td-agent.conf
-/var/log/td-agent/alerts.log
-/var/log/td-agent/pdnssoc_sys.log
-/var/log/td-agent/alerts.log
-/var/log/td-agent/buffer
-/var/log/td-agent/pdnssoc-alerts
-/var/log/td-agent/pdnssoc-alerts/pdnssoc-buffer
-/var/log/td-agent/pdnssoc-alerts/results
-/var/log/td-agent/pdnssoc_sys.log
-/var/log/td-agent/queries
-```
-
-
-### Container deployment
-
-1. You need to have `docker`, `docker-compose` and `git` installed. An example for AlmaLinux 9 / Centos 9:
-```
-sudo yum update -y
-sudo yum install -y yum-utils
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum update -y
-sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo systemctl start docker
-sudo yum install -y git
-```
-
-2. Clone the repo:
-
-```
-git clone https://github.com/CERN-CERT/pDNSSOC.git
-```
-
-3. Go to the `files` directory inside the repo.
-4. Populate the configuration `pdnssoc.conf` with the MISP server(s) details and the alert emails details.
-5. Make any changes (if needed) on the fluentd configuration `td-agent.conf`.
-6. Build the docker container:
-
-```
-docker build -t pdnssoc .
-```
-
-7. Start the docker container:
-
-```
-docker compose up
-```
-
-8. That's it!
-
-
-Directory structure:
-
-```
-./pDNSSOC
-├── docs
-├── files
-│   ├── code
-│   │   ├── alerts.rb
-│   │   ├── configalerts.rb
-│   │   ├── constants.rb
-│   │   ├── email.rb
-│   │   ├── pdnssoc.rb
-│   │   └── trigger.rb
-│   ├── crontab
-│   ├── docker-compose.yml
-│   ├── Dockerfile
-│   ├── install.sh
-│   ├── logs
-│   │   ├── alerts.log
-│   │   ├── buffer
-│   │   ├── pdnssoc-alerts
-│   │   │   ├── pdnssoc-buffer
-│   │   ├── pdnssoc_sys.log
-│   │   ├── queries
-│   ├── notification_email.html
-│   ├── pdnssoc.conf
-│   ├── pdnssoc.cron
-│   └── td-agent.conf
-├── images
-└── README.md
+/etc/pdnssoc/
+├── notification_email.html
+├── pdnssoc.conf
+├── td-agent.conf.template
+└── timers
+    ├── lookingback.timer
+    ├── misp_refresh.timer
+    └── pdnssoc.timer
+/etc/td-agent/
+├── misp_domains.txt
+├── misp_ips.txt
+├── plugin
+└── td-agent.conf -> /etc/pdnssoc/td-agent.conf
 ```
 
 ### Configuration file
