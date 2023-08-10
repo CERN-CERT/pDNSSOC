@@ -82,24 +82,24 @@ curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
 ```
 wget https://rubygems.org/downloads/pdnssoc-VERSION.gem
 ```
-4. Install the rpm:
+5. Install the rpm:
 ```
 rpm -i pdnssoc-VERSION-RELEASE.x86_64.rpm
 ```
-5. Populate the configuration in `/etc/pdnssoc/pdnssoc.conf` with the MISP server(s) details and the alert emails details
-6. Use the fluentd config template in `/etc/pdnssoc/td-agent.conf.template` to overwrite or adapt `/etc/td-agent/td-agent.conf`
-7. Include the appropriate firewall rules in order to accept incoming traffic:
+6. Populate the configuration in `/etc/pdnssoc/pdnssoc.conf` with the MISP server(s) details and the alert emails details
+7. Use the fluentd config template in `/etc/pdnssoc/td-agent.conf.template` to overwrite or adapt `/etc/td-agent/td-agent.conf`
+8. Include the appropriate firewall rules in order to accept incoming traffic:
 ```
 firewall-cmd --zone=public --add-port=5140-5143/tcp --permanent
 firewall-cmd --zone=public --add-port=5555/tcp --permanent
 firewall-cmd --reload
 ```
-5. Do an initial load of malicious domains from MISP:
+9. Do an initial load of malicious domains from MISP:
 ```
 /bin/bash /usr/local/bin/pdnssoc/misp_refresh.sh
 systemctl restart td-agent
 ```
-5. That's it! You can do the following to check that the system is well configured:
+10. That's it! You can do the following to check that the system is well configured:
 ```
 systemctl list-timers
 netstat -putan | grep -E ':(514[0-3]|5555) '
