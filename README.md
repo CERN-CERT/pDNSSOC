@@ -72,11 +72,15 @@ pDNSSOC operators are typically security teams at NREN CERTs, e-infratructure se
 1. Get a fresh CENTOS 9 or AlmaLinux 9 (or any binary-compatible system with Red Hat Enterprise Linux 9) VM
 2. Install the needed libraries:
 ```
-yum install gem jq ruby-devel
+yum install gem jq rubygems-devel
 ```
 3. Download and install td-agent (fluentd):
 ```
 curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
+```
+4. Download the gem file:
+```
+wget https://rubygems.org/downloads/pdnssoc-VERSION.gem
 ```
 4. Install the rpm:
 ```
@@ -97,7 +101,8 @@ systemctl restart td-agent
 ```
 5. That's it! You can do the following to check that the system is well configured:
 ```
-sudo systemctl list-timers
+systemctl list-timers
+netstat -putan | grep -E ':(514[0-3]|5555) '
 ```
 
 Directory structure:
