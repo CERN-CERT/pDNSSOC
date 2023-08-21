@@ -1,0 +1,6 @@
+[Unit]
+Description=Run misp_refresh.sh every 15 minutes
+
+[Service]
+ExecStart=/bin/bash /usr/local/bin/pdnssoc/misp_refresh.sh
+User=root

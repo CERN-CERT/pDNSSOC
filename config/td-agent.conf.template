@@ -66,12 +66,26 @@
   @type forward
   port 5555
   tag pdnssocdata
+  # tls true
+  # tls_cert_path /path/to/fluentd.crt
+  # tls_private_key_path /path/to/fluentd.key
   <parse>
         @type regexp
     expression /{"date":"(?<date>.*)","client":"(?<client>.*)","query":"(?<query>.*)"}/
   </parse>
 </source>
 
+## OpenSearch
+# Getting logs from pdnssoc to send to OpenSearch
+# <source>
+#   @type tail
+#   path /var/log/td-agent/alerts.log
+#   tag pdnssoc_alerts
+#   read_from_head true
+#   <parse>
+#     @type json
+#   </parse>
+# </source>
 
 ## DATA ROUTING
 # Copying our pdnssocdata into multiple streams
@@ -101,6 +115,8 @@
         # <server>
         #   host upstream-pdnssoc.domain.edu
         #   port 5555
+        #   tls true
+        #   tls_cert_path /path/to/fluentd.pem
         # </server>
         #</store>
         #######################
@@ -130,7 +146,7 @@
   @type filter_list
   filter AC
   key_to_filter query
-  pattern_file_paths ["/etc/td-agent/misp_domains.txt"]
+  pattern_file_paths ["/etc/pdnssoc/misp_domains.txt"]
   filter_empty true
   action whitelist
 </filter>
@@ -146,7 +162,7 @@
   @type filter_list
   filter AC
   key_to_filter answer
-  pattern_file_paths ["/etc/td-agent/misp_domains.txt", "/etc/td-agent/misp_ips.txt"]
+  pattern_file_paths ["/etc/pdnssoc/misp_domains.txt", "/etc/pdnssoc/misp_ips.txt"]
   filter_empty true
   action whitelist
 </filter>
@@ -171,3 +187,13 @@
   </buffer>
 </match>
 </label>
+
+# Forward logs to OpenSearch
+# <match pdnssoc_alerts>
+#   @type opensearch
+#   hosts https://opensearch.domain.org
+#   logstash_format true
+#   logstash_prefix pdnssoc
+#   user %{USER}
+#   password %{PASSWORD}
+# </match>

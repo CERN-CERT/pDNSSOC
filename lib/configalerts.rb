@@ -1,6 +1,7 @@
 require "json"
 require 'logger'
 require "time"
+puts $LOAD_PATH
 require 'parseconfig'
 require_relative 'constants'
 
