@@ -94,7 +94,14 @@ firewall-cmd --zone=public --add-port=5140-5143/tcp --permanent
 firewall-cmd --zone=public --add-port=5555/tcp --permanent
 firewall-cmd --reload
 ```
-9. Do an initial load of malicious domains from MISP:
+9.Enable timers:
+```
+sudo systemctl daemon-reload
+sudo systemctl enable pdnssoc.timer lookingback.timer misp_refresh.timer
+sudo systemctl start pdnssoc.timer lookingback.timer misp_refresh.timer
+```
+
+10. Do an initial load of malicious domains from MISP:
 ```
 /bin/bash /usr/local/bin/pdnssoc/misp_refresh.sh
 systemctl restart td-agent
