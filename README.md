@@ -236,6 +236,8 @@ for log_file in $(ls $path_logs | grep -E "pdnssoc-queries.log.[0-9]+")
 	do
     mv "$path_logs/$log_file" $path_target
     cat  "$path_target/$log_file" | nc $pdnssoc_server $pdnssoc_server_port -w 10
+    # Use the following if you send data to TLS enabled endpoint
+    cat  "$path_target/$log_file" | nc --ssl $pdnssoc_server $pdnssoc_server_port -w 10
 done
 
 rm -f $path_target/*

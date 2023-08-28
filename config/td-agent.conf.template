@@ -28,6 +28,12 @@
   @type tcp
   port 5141
   tag pdnssocdata
+# For accepting data with TLS, enable the following
+#  <transport tls>
+#    ca_path /etc/pki/ca.pem
+#    cert_path /etc/pki/cert.pem
+#    private_key_path /etc/pki/key.pem
+#  </transport>
   <parse>
         @type regexp
         expression /(?<date>.*) client \@.* (?<client>.*)#.*: query: (?<query>\S+) .*/
