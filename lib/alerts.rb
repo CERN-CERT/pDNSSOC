@@ -47,6 +47,7 @@ class Alert
                   'misp_info' => misp_event.info,
                   'misp_id' => misp_event.id,
                   'misp_server' => misp_server["domain"],
+                  'event_url' => MISP_URL % [s:misp_server["domain"], i:misp_event.id],
                   'num_iocs' => misp_event.attribute_count,
                   'publication' => misp_event.date,
                   'organisation' => misp_event.orgc.name,
