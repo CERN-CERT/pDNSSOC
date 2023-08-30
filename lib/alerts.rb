@@ -43,6 +43,7 @@ class Alert
                   $tags.append({"colour" => tag.colour, "name" => tag.name})
                 end
                 event = {
+                  'misp_event_url' => 'https://' + misp_server["domain"] + '/events/view/' + misp_event.id,
                   'misp_uuid' => misp_event.uuid,
                   'misp_info' => misp_event.info,
                   'misp_id' => misp_event.id,
@@ -72,7 +73,7 @@ class Alert
 
   def get_client_info(ip_client, key_reference)
     pdns_client = ""
-    if @@pdns_config[ip_client] 
+    if @@pdns_config[ip_client]
       # If the name is present on the configuration file we will use it on the email. Otherwise we will just use the ip
       if @@pdns_config[ip_client].keys.include?(key_reference) and ! @@pdns_config[ip_client][key_reference].empty?
         pdns_client = @@pdns_config[ip_client][key_reference]
@@ -89,7 +90,7 @@ class Alert
     events_uuid = [] # List of MISP uuid used to avoid repeat events
 
     for misp_server in @@misp_config
-      if ! @@faulty_misp_servers.include?(misp_server["url"]) 
+      if ! @@faulty_misp_servers.include?(misp_server["url"])
         events_uuid = events_uuid.flatten
         events_detected, uuids=query_misp(misp_server, ioc_detected, type_ioc, events_uuid)
         if events_detected.length > 0
@@ -103,6 +104,7 @@ class Alert
 
     if $num_misp_events > 0
       result_ioc= {
+        'ioc_provider' => 'pdnssoc',
         'client_ip' => ip_client,
         'client_name' => get_client_info(ip_client, "name"),
         'count' => 1,
