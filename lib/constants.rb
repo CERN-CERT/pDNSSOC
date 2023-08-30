@@ -13,6 +13,7 @@ module ConstantsConfig
     PATH_HTML = ENV['PATH_HTML'] || "/etc/pdnssoc/notification_email.html"
     FILENAME_LOG_ALERT = ENV['FILENAME_LOG_ALERT'] || "alerts.log"
     FILENAME_LOG_SYS = ENV['FILENAME_LOG_SYS'] || "pdnssoc_sys.log"
+    MISP_URL = "https://%{s}/events/view/%{i}"
 end
 
 module ConstantsGeneral
