@@ -1,0 +1,11 @@
+logging_level: "INFO"
+
+misp_servers:
+  - domain: "https://your-misp-server.com"
+    api_key: "API_KEY_1"
+
+correlation:
+  output_dir: /var/dnscollector/alerts
+  malicious_domains_file: /var/dnscollector/misp_domains.txt
+  malicious_ips_file: /var/dnscollector/misp_ips.txt
+  last_correlation_pointer_file: /var/dnscollector/correlation.last

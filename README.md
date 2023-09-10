@@ -17,15 +17,13 @@ pDNSSOC provides a turn-key solution to both detect and respond to security inci
 
 **pDNSSOC is aimed at providing SOC capabilities in under 10 sec on a fresh VM.**
 
-pDNSSOC is a a to be a minimalistic component correlating DNS logs with threat intel from a MISP in order to send alert.
+pDNSSOC is a lightweight component correlating DNS logs with threat intelligence aiming at communities with mixed levels of security expertise.
 
-
-pDNSSOC is aimed at communities with mixed levels of security expertise.
 Basically:
 1. A central security team is available
 2. The central team operate or has access to one or more MISP instances
 3. The central team deploys and operates a pDNSSOC server
-4. Community members send some for of DNS logs to the pDNSSOC server
+4. Community members send DNS logs to the pDNSSOC server
 5. The central team receives security alerts about matches between DNS queries made by the client and malicious domains sources from MISP
 
 pDNSSOC logs can be used to:
@@ -38,18 +36,12 @@ pDNSSOC logs can be used to:
 
 ### Client side
 
-There is no actual pDNSSOC client. Simple!
-Clients send DNS data by configuring existing services to send data using one of the supported methods:
-- Configure their DNS server to log queries and then use syslog
-- Configure their DNS server to log queries and the send them over TCP
-- Configure their DNS server, network equipment, IDS, Zeek, or any part of their infrastructure to produce pDNS data and send the data over TCP
-- Other way to produce and send DNS data can easily be added
+In order to get quality and well-formatted data for correlation, the DNS log shipping implementation is based on [go-dnscollector](https://github.com/dmachard/go-dnscollector), a lightweight DNS logging collector supporting various log sources (e.g. AF_PACKET, dnstap, log files).
 
 ### Server side
 
 Deploying and operating pDNSSOC is expected to require little/no specific expertise beyond basic sysadmin work.
 A pDNSSOC instance typically runs on a small VM and can handle large volume of DNS data -- many deployment scenarios are possible.
-
 
 
 ## Deploying a pDNSSOC server
@@ -58,280 +50,153 @@ The intent is to allow pDNSSOC to be used in environment where:
 - The clients have very limited time and expertise
 - The pDNSSOC operator has security expertise and existing trust relationships with the clients
 
-![](docs/images/graph1.png)
+```mermaid
+flowchart LR
+    A[DNS Logs] --> C(pDNSSOC)
+    B[Threat intelligence\n IOCs] --> C(pDNSSOC)
+    C(pDNSSOC) -->|alerts| D[Clients]
+
+```
 
 ### Who should deploy a pDNSSOC server?
 
 pDNSSOC operators are typically security teams at NREN CERTs, e-infratructure security teams, regional or national security teams, central teams of distributed projects/organizations, Managed Security Service Providers, etc.
 
 
-### How to deploy and configure a pDNSSOC server?
+### Deployment
 
-### VM deployment
+#### Client
+A specific collector needs to be installed on the client side to ensure proper formatting and filtering of DNS logs:
 
-1. Get a fresh CENTOS 9 or AlmaLinux 9 (or any binary-compatible system with Red Hat Enterprise Linux 9) VM
-2. Install the needed libraries:
-```
-yum install gem jq rubygems-devel
-```
-3. Download and install td-agent (fluentd):
-```
-curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent4.sh | sh
-```
-4. Download the gem file:
-```
-curl -o /path/to/download/pdnssoc-VERSION.gem https://rubygems.org/downloads/pdnssoc-VERSION.gem
-```
-5. Install the rpm:
-```
-rpm -i pdnssoc-VERSION-RELEASE.noarch.rpm
-```
-6. Populate the configuration in `/etc/pdnssoc/pdnssoc.conf` with the MISP server(s) details and the alert emails details
-7. Use the fluentd config template in `/etc/pdnssoc/td-agent.conf.template` to overwrite or adapt `/etc/td-agent/td-agent.conf`
-8. Include the appropriate firewall rules in order to accept incoming traffic:
-```
-firewall-cmd --zone=public --add-port=5140-5143/tcp --permanent
-firewall-cmd --zone=public --add-port=5555/tcp --permanent
-firewall-cmd --reload
-```
-9.Enable timers:
-```
-sudo systemctl daemon-reload
-sudo systemctl enable pdnssoc.timer lookingback.timer misp_refresh.timer
-sudo systemctl start pdnssoc.timer lookingback.timer misp_refresh.timer
-```
+##### Steps
+1. Install `go-dnscollector`
+    ```sh
+    curl -LO  "https://github.com/dmachard/go-dnscollector/releases/download/v${GO_DNSCOLLECTOR_VERSION}/go-dnscollector_${GO_DNSCOLLECTOR_VERSION}_linux_amd64.tar.gz" && \
+    tar xvf "go-dnscollector_${GO_DNSCOLLECTOR_VERSION}_linux_amd64.tar.gz" && \
+    mv go-dnscollector /usr/bin/
+    ```
+2. Modify the collector config file based on the [client template](files/configuration/dnscollector/client.yml).
+3. Start the collector
+    ```sh
+    go-dnscollector -c client.yml
+    ```
 
-10. Do an initial load of malicious domains from MISP:
-```
-/bin/bash /usr/local/bin/pdnssoc/misp_refresh.sh
-systemctl restart td-agent
-```
-10. That's it! You can do the following to check that the system is well configured:
-```
-systemctl list-timers
-netstat -putan | grep -E ':(514[0-3]|5555) '
-```
+#### pDNSSOC server
 
-Directory structure:
-```
-/etc/pdnssoc/
-├── notification_email.html
-├── pdnssoc.conf
-└── td-agent.conf.template
+The main DNS log collection point correlating data with IOCs and producing JSON files ready to be ingested in alerting systems.
 
-/etc/td-agent/
-├── misp_domains.txt
-├── misp_ips.txt
-├── plugin
-└── td-agent.conf -> /etc/pdnssoc/td-agent.conf
+##### Requirements
 
-/var/log/td-agent/
-...
-├── queries/
-├── pdnssoc-alerts
-│   └──pdnssoc-buffer/
-├── alerts.log
-├── pdnssoc_sys.log
-└── td-agent.log
-
-/usr/lib/systemd/system/
-...
-├── lookingback.service
-├── lookingback.timer
-├── misp_refresh.service
-├── misp_refresh.timer
-├── pdnssoc.service
-└── pdnssoc.timer
-
-```
-
-### Configuration file
-
-The pDNSSOC server configuration file is simple and available at `pdnssoc.conf`.
-
-The configuration files allow to define:
-- MISP servers to fetch domains from, including specific `tags` or timeframes
-- Define the email resultings from alerts (`from`, `to`, `subject` fields, and SMTP servers details)
-- **[Optional]** flag specific VIP pDNSSOC clients in the alerts. These `pdns_client` will have extra visibility in the alerts. This feature is helpful when the server is receiving data from a mixed of sources, to give additional visibility to pDNSSOC clients with many DNS clients behind (e.g a pDNS collector for multiple universities) versus end-user clients.
-
-```
-{
-    "misp_servers": [
-        {
-            "url":"https://misp1.myserver.org/",
-            "api_key":"API_KEY_1",
-            "parameter":"/attributes/restSearch/returnFormat:text/type:domain/"
-        },
-        {
-            "url":"https://misp2.myotherserver.ch/",
-            "api_key":"API_KEY_2",
-            "parameter":"/attributes/restSearch/returnFormat:text/type:domain/from:2022-01-01/"
-        }
-    ],
-    "alerts_path":"/var/log/td-agent/pdnssoc-alerts/",
-    "pdns_client" : {
-        "127.0.0.1":
-        {
-            "name":"Test host",
-            "email":"email@address.tld"
-        }
-    },
-    "email" : {
-        "from":"pdnssoc-dev@domain.tld",
-        "to":"pdnssoc-dev@domain.tld",
-        "subject":"[pDNSSOC] Community XYZ alert",
-        "server":localhost",
-        "port":25
-    }
-
-}
-```
-### Configuring input channels
-
-pDNSSOC relies on `Fluentd` and uses regular expression to match up incoming traffic from clients.
-The defaults input paths are configured:
-- `TCP/5140`: DNS queries from syslog
-- `TCP/5141`: DNS queries from BIND using syslog format send over TCP
-- `TCP/5142`: pDNS data from dnstap (https://dnstap.info)
-- `TCP/5555`: pDNS data forwarded from another pDNSSOC server
-
-Input channels are defined and configurable at `td-agent.conf`.
-
-## Configuring pDNSSOC clients
-
-### DNS logs via TCP
-
-Sending logs directly from the DNS server over TCP is the recommended input path for pDNSSOC.
-
-For BIND, the solution below involves NO extra package to be installed on the system, NO recompilation of BIND or any extra modules.
-It simply relies on a shell script and a BIND logging configuration change:
-1. Configure BIND  in `/etc/named/logging.conf`, to log `queries` in a file, for example:
-```
-# Add a channel to write DNS queries to a log file
-
-     channel queries_file_pdnssoc {
-        file "/var/log/named/pdnssoc-queries.log" versions 100 size 2m;
-        severity dynamic;
-        print-time yes;
-    };
+* python3
+* supervisor
+* superfsmon
 
 
-category queries { queries_file_pdnssoc; };
-```
-2. Send the resulting data over TCP to the pDNSSOC server, for example with this shell script:
-```
-$ mkdir -p  /var/log/named/sender/
-$ cat /usr/local/bin/pdns_soc_sender.sh
-#!/bin/bash
+##### Steps
 
-pdnssoc_server="<ADD_YOUR_pDNSSOC_HOSTNAME_HERE>"
-pdnssoc_server_port="5141"
+1. Install `go-dnscollector`
+    ```sh
+    curl -LO  "https://github.com/dmachard/go-dnscollector/releases/download/v${GO_DNSCOLLECTOR_VERSION}/go-dnscollector_${GO_DNSCOLLECTOR_VERSION}_linux_amd64.tar.gz" && \
+    tar xvf "go-dnscollector_${GO_DNSCOLLECTOR_VERSION}_linux_amd64.tar.gz" && \
+    mv go-dnscollector /usr/bin/
+    ```
+2. Modify the collector config file based on the [server template](files/configuration/dnscollector/server.yml) and place under `/etc/dnscollector/config.yml`
+3. Create the required files for storing incoming DNS logs:
+    ```sh
+    mkdir -p /var/dnscollector/matches
+    ```
+4. Copy the [postrotate script](files/configuration/dnscollector/postrotate_query.sh) to `/var/dnscollector/postrotate_query.sh`
+5. Ensure that the collecting port set in the previous step is accessible.
+6. Install `pdnssoc-cli`
+    ```sh
+    pip install pdnssoc-cli
+    ```
+7. Modify the pdnssoccli config file based on the [pdnssoccli template](files/configuration/pdnssoccli/pdnssoccli.yml) by adding MISP details.
+8. Install `supervisor` tooling
+    ```sh
+    pip install supervisor superfsmon
+    ```
+9.  Launch `supervisord` with the config file of the [template](files/configuration/supervisor/supervisord.conf).
+    ```ssh
+    supervisord -c supervisord.conf
+    ```
+10. Schedule the following recurring commands (e.g. with crond, timers):
+    * Refresh of IOCs:
+        ```sh
+        pdnssoc-cli -c pdnssoccli.yml fetch-iocs
+        ```
+    * Run correlation:
+        ```sh
+        pdnssoc-cli -c pdnssoccli.yml correlate /var/dnscollector/matches/
+        ```
+11. That's it. Alerts can be found at `/var/dnscollector/alerts`.
 
+##### Docker
 
-path_logs="/var/log/named/"
-path_target="/var/log/named/sender/"
+All of the previous steps for the server part can be automated using the dockerized pdnssoc version:
 
+1. Install `docker`, `docker-compose` and `git`.
+2. Fetch pdnssoc:
+    ```sh
+    git clone --depth 1 --branch v0.0.2 https://github.com/CERN-CERT/pDNSSOC.git
+    ```
+3. Go to the `files/docker` directory
+4. Populate `pdnssoccli.yml` with MISP server details.
+5. Run `docker-compose up`
 
-for log_file in $(ls $path_logs | grep -E "pdnssoc-queries.log.[0-9]+")
-	do
-    mv "$path_logs/$log_file" $path_target
-    cat  "$path_target/$log_file" | nc $pdnssoc_server $pdnssoc_server_port -w 10
-    # Use the following if you send data to TLS enabled endpoint
-    cat  "$path_target/$log_file" | nc --ssl $pdnssoc_server $pdnssoc_server_port -w 10
-done
-
-rm -f $path_target/*
-```
-
-3. Call the script above on a regular basis with a CRON:
-
-```
-$ cat /etc/crontab 
-*/5 * * * * root  /usr/local/bin/pdns_soc_sender.sh  &> /dev/null
-```
-4. Restart/reload involved services where configuration was changed
-
-### DNS logs via rsyslog
-
-Although `syslog` and `rsyslog` would be trivial and convenient options, unfortunately, they result in significant amount of data loss, even over TCP.
-
-For low-load DNS server, where direct TCP is not possible, using `rsyslog`
-with the syslog Forwarding Output Module `omfwd` is the recommended solution:
-1. Configure BIND  in `/etc/named/logging.conf`, to log `queries` in a facility like `local0`, for example:
-```
-    channel queries_remote {
-        syslog local0;
-        severity dynamic;
-        print-time yes;
-    };
-
-category queries { queries_remote; };
+In case you need to re-build the image, please use the following (after adjusting the tags to match the latest dependency versions):
+```sh
+cd files/docker
+docker build . -t pdnssoc --build-arg GO_DNSCOLLECTOR_VERSION="0.35.0" --build-arg PDNSSOC_CLI_VERSION="v0.0.2" --build-arg SUPERCRONIC_VERSION=
+"v0.2.26"
 ```
 
 
-3. Configure `rsyslog` to send the logs in `local0.*` to a pDNSSOC server:
-```
-$ cat /etc/rsyslog.d/01-named.conf 
-local0.* action(type="omfwd"
-      queue.type="linkedlist"
-      action.resumeRetryCount="-1"
-      queue.saveOnShutdown="on"
-      target="<ADD_YOUR_pDNSSOC_HOSTNAME_HERE>" port="5140" protocol="tcp"
-     )
-```
+## Important directories
+* `/var/dnscollector/queries/`: One of the default flows for the receiving dns collector is compressing and storing the unfiltered DNS traffic for future correlation. In this directory you will find multiple archives per day hosting the aggregated received DNS traffic.
+* `/var/dnscollector/matches/`: DNS log entries matching the IOC lists defined during ingestion. These files are afterwards enriched with threat intelligence data and stored in `/var/dnscollector/alerts/`.
+* `/var/dnscollector/alerts/`: JSON files ready to be ingested in logging and alerting systems (e.g. Opensearch) or consumed by tools to generate notifications.
+* `/var/dnscollector/misp_domains.txt`: New-line separated file with malicious domains fetched by MISP servers defined in `/etc/dnscollector/pdnssoccli.yml`. Those are used for DNS request correlation.
+* `/var/dnscollector/misp_domains.txt`: New-line separated file with malicious IPs fetched by MISP servers defined in `/etc/dnscollector/pdnssoccli.yml`. Those are used for DNS response correlation.
 
-4. Restart/reload involved services where configuration was changed
-
-### DNSTap logs
-
-By default, pDNSSOC supports receiving real time DNS logs on `TCP/5142`.
-The default format is `dnstap` `RESOLVER_RESPONSE(RR)` data, but other formats can be added by modifying the appropriate regular expression in `/etc/td-agent/td-agent.conf`.
-
-`dnstap`is already compiled and enabled in BIND starting RHEL 8 as well as in most Linux distributions. `BIND` needs to be configured to send `RESOLVER_RESPONSE` (`RR`) data in `named.conf`:
-```
-...
-dnstap {resolver response;} ;
-...
-```
-
-Additional `dnstap` guidance is available online, including for other OSes and DNS servers, for exemple [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/assembly_using-dnstap-in-rhel-8_configuring-basic-system-settings) and [here](https://dmachard.github.io/posts/0001-dnstap-testing/) or [here](https://jpmens.net/2017/09/11/dns-query-response-logging-with-dnstap/).
 
 ## FAQ
-
 
 ### Deployment questions and support
 
 #### Can I operate a pDNSSOC server for my local community and pass on the data flow to another security team with access to a better MISP instance?
 
-Yes, **providing trust and privacy issues** have been addressed with all parties. 
-It is possible to configure a pDNSSOC server as a client for another pDNSSOC server.
-On the *source* pDNSSOC server, edit `/etc/td-agent/td-agent.conf`, uncomment and edit the `## Send data to another pDNSSOC server` section according to your needs:
+Yes, **providing trust and privacy issues** have been addressed with all parties.  It is possible to configure a pDNSSOC server as a client for another pDNSSOC server.
 
-```
-	## Send data to another pDNSSOC server
-	#
-        <store>
-         @type forward
-         send_timeout 60s
-         recover_wait 10s
-         hard_timeout 60s
-         <server>
-           host myhost.domain.edu
-           port 5555
-         </server>
-        </store>
-	#
-        #######################
+Forwarding requires adding another logger in the server dnscollector side:
+```yaml
+  loggers:
+    - name: pdnssoc_forwarder
+      dnstap:
+        remote-address: pdnssoc_second_server_ip # Modify with the target pdnssoc destination
+        remote-port: pdnssoc_server_port
+        connect-timeout: 5
+        retry-interval: 10
+        flush-interval: 10
+        tls-support: false
+        tls-insecure: false
+        server-id: "SERVER_ID" @
+        buffer-size: 100
+        chan-buffer-size: 65535
+    - .... Other loggers....
+
+  routes:
+    - from: [ dnstap ]
+      to: [ filelogdomains, filelogips, fileall, pdnssoc_forwarder ]
 ```
 
 #### Is it possible to use multiple MISP instance?
-Yes. Just add them in the pDNSSOC configuration file at `/etc/pdnssoc/pdnssoc.conf`.
+Yes. Just add them in the pdnssoc-cli configuration file.
 
 #### Is it possible to add other DNS server types or input format?
 
-Yes. More input formats and paths can be added simply by editing the `Fluentd` configuration file (typically `/etc/td-agent/td-agent.conf`) with an extra TCP port and the relevant regular expression.
-`Fluentd` expects the following fields: `<date>`, `<client>` and `query`.
+Yes. All of the input implementations listed at the `go-dnscollector` [documentation](https://github.com/dmachard/go-dnscollector/blob/main/docs/collectors.md) are supported by pdnssoc-cli
 
-### Bug reports
+## Bug reports
 
 Please report issues on [Github](https://github.com/CERN-CERT/pDNSSOC/issues).

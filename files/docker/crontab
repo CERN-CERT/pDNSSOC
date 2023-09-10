@@ -1,0 +1,9 @@
+SHELL=/bin/bash
+BASH_ENV=/etc/environment
+
+# Fetch new IOCs
+*/1 * * * * pdnssoc-cli -c /etc/pdnssoccli.yml fetch-iocs >/proc/1/fd/1 2>/proc/1/fd/2
+
+# Run correlation
+#*/1 * * * * bash -c "pdnssoc-cli -c /etc/pdnssoccli.yml correlate  --start-date $(date +%Y-%m-%dT%H:%M:%S -d '2 weeks ago') /var/dnscollector/matches/ >/proc/1/fd/1 2>/proc/1/fd/2 "
+*/1 * * * * bash -c "pdnssoc-cli -c /etc/pdnssoccli.yml correlate /var/dnscollector/matches/ >/proc/1/fd/1 2>/proc/1/fd/2"
