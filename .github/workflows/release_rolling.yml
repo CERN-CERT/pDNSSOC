@@ -1,9 +1,8 @@
-name: Release to ghcr
+name: Release edge version to ghcr
 
 on:
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+    branches: ['main']
 
 env:
   REGISTRY: ghcr.io
@@ -33,12 +32,6 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # Store the version, stripping any v-prefix
-      - name: Write release version
-        run: |
-          TAG=${{ github.event.release.tag_name }}
-          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.0.0
         with:
@@ -46,8 +39,7 @@ jobs:
           context: ./files/docker
           push: true
           tags: |
-            ghcr.io/cern-cert/pdnssoc:latest
-            ghcr.io/cern-cert/pdnssoc:${VERSION}
+            ghcr.io/cern-cert/pdnssoc:edge
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             GO_DNSCOLLECTOR_VERSION:="0.35.0"
