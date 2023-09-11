@@ -1,0 +1,51 @@
+
+################################################
+# Collector configuration
+################################################
+global:
+  trace:
+    verbose: fase
+  text-format: "timestamp-rfc3339ns identity operation rcode queryip queryport family protocol length qname qtype latency"
+  # default text field delimiter
+  text-format-delimiter: " "
+  # default text field boundary
+  text-format-boundary: "\""
+
+multiplexer:
+  collectors:
+    - name: dnstap
+      dnstap:
+        listen-ip: 0.0.0.0
+        # Modify with the port set as target for the client
+        listen-port: 6000
+        chan-buffer-size: 655350
+
+  loggers:
+    - name: filelogdomains
+      logfile:
+        file-path: /var/dnscollector/matches/matches_domains.json
+        mode: json
+      transforms:
+        filtering:
+          keep-fqdn-file: '/var/dnscollector/misp_domains.txt'
+
+    - name: filelogips
+      logfile:
+        file-path: /var/dnscollector/matches/matches_ips.json
+        mode: json
+      transforms:
+        filtering:
+          keep-rdata-file: '/var/dnscollector/misp_ips.txt'
+
+    - name: fileall
+      logfile:
+        file-path: /var/dnscollector/queries.log
+        mode: json
+        max-size: 100
+        max-files: 100
+        postrotate-command: "/var/dnscollector/postrotate_query.sh"
+        postrotate-delete-success: true
+
+  routes:
+    - from: [ dnstap ]
+      to: [ filelogdomains, filelogips, fileall ]

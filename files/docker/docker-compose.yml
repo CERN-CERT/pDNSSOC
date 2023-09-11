@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  dnscollector:
+    image: pdnssoc
+    command: >
+      bash -c "mkdir -p /var/dnscollector/alerts
+      && mkdir -p /var/dnscollector/matches
+      && pdnssoc-cli -c /etc/pdnssoccli.yml fetch-iocs
+      && /usr/bin/supervisord -c /etc/supervisor/supervisord.conf"
+    ports:
+      - "6000:6000"
+    volumes:
+      - ./logs:/var/dnscollector/ # Logging destination
+      - ./crontab:/etc/crontab
+      - ./pdnssoccli.yml:/etc/pdnssoccli.yml
