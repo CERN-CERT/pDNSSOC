@@ -129,6 +129,11 @@ The main DNS log collection point correlating data with IOCs and producing JSON 
         ```sh
         pdnssoc-cli -c pdnssoccli.yml correlate /var/dnscollector/matches/
         ```
+    * Run correlation for archived data:
+        ```sh
+        # Pick a date that covers all of your dataset entries
+        pdnssoc-cli -c /etc/pdnssoccli.yml correlate /var/dnscollector/queries/ --start-date 1996-12-10T00:00:00
+        ```
 11. That's it. Alerts can be found at `/var/dnscollector/alerts`.
 
 ##### Docker
