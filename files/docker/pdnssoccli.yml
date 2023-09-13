@@ -3,6 +3,7 @@ logging_level: "INFO"
 misp_servers:
   - domain: "https://your-misp-server.com"
     api_key: "API_KEY_1"
+    args: {}
 
 correlation:
   output_dir: /var/dnscollector/alerts
