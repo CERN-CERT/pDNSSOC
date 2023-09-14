@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   dnscollector:
-    image: pdnssoc
+    image: ghcr.io/cern-cert/pdnssoc:edge
     command: >
       bash -c "mkdir -p /var/dnscollector/alerts
       && mkdir -p /var/dnscollector/matches
@@ -12,3 +12,12 @@ services:
     volumes:
       - ./logs:/var/dnscollector/ # Logging destination
       - ./pdnssoccli.yml:/etc/pdnssoccli.yml
+
+  # Uncomment to enable shipping to different logging systems
+  # e.g. Opensearch, kafka
+  #fluentd:
+  #  build: ./fluentd
+  #  volumes:
+  #    - ./fluentd:/fluentd/etc
+  #    - ./logs:/var/pDNSSOC/
+
