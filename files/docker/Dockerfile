@@ -2,11 +2,6 @@ FROM python:3.11-alpine
 
 ARG GO_DNSCOLLECTOR_VERSION
 ARG PDNSSOC_CLI_VERSION
-ARG SUPERCRONIC_VERSION
-
-ENV SUPERCRONIC_URL="https://github.com/aptible/supercronic/releases/download/$SUPERCRONIC_VERSION/supercronic-linux-amd64" \
-    SUPERCRONIC=supercronic-linux-amd64 \
-    SUPERCRONIC_SHA1SUM=7a79496cf8ad899b99a719355d4db27422396735
 
 RUN apk add --no-cache --update \
     bash  \
@@ -35,13 +30,6 @@ RUN curl -LO  "https://github.com/dmachard/go-dnscollector/releases/download/v${
         mv go-dnscollector /usr/bin/
 
 RUN mkdir /etc/dnscollector
-
-# Install supercronic
-RUN curl -fsSLO "$SUPERCRONIC_URL" \
- && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
- && chmod +x "$SUPERCRONIC" \
- && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
- && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
 RUN pip install superfsmon
 

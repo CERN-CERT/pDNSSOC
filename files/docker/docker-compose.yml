@@ -11,5 +11,4 @@ services:
       - "6000:6000"
     volumes:
       - ./logs:/var/dnscollector/ # Logging destination
-      - ./crontab:/etc/crontab
       - ./pdnssoccli.yml:/etc/pdnssoccli.yml

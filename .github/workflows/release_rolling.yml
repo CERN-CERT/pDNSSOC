@@ -43,5 +43,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             GO_DNSCOLLECTOR_VERSION=0.35.0
-            SUPERCRONIC_VERSION=v0.2.26
-            PDNSSOC_CLI_VERSION=0.0.2.dev7
+            PDNSSOC_CLI_VERSION=0.0.2.dev8

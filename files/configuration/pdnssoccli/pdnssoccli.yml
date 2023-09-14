@@ -3,10 +3,21 @@ logging_level: "INFO"
 misp_servers:
   - domain: "https://misp1.myserver.org/"
     api_key: "API_KEY_1"
-    args: {}
+    args:
+      enforce_warninglist: True
 
 correlation:
+  input_dir: /var/dnscollector/queries
   output_dir: /var/dnscollector/alerts
   malicious_domains_file: /var/dnscollector/misp_domains.txt
   malicious_ips_file: /var/dnscollector/misp_ips.txt
   last_correlation_pointer_file: /var/dnscollector/correlation.last
+  last_retro_pointer_file: /var/dnscollector/repo.last
+
+schedules:
+  fetch_iocs:
+    interval: 10 # minutes
+  correlation:
+    interval: 1 # minutes
+  retro:
+    interval: 1440 # minutes

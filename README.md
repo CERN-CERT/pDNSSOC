@@ -152,8 +152,7 @@ All of the previous steps for the server part can be automated using the dockeri
 In case you need to re-build the image, please use the following (after adjusting the tags to match the latest dependency versions):
 ```sh
 cd files/docker
-docker build . -t pdnssoc --build-arg GO_DNSCOLLECTOR_VERSION="0.35.0" --build-arg PDNSSOC_CLI_VERSION="v0.0.2" --build-arg SUPERCRONIC_VERSION=
-"v0.2.26"
+docker build . -t pdnssoc --build-arg GO_DNSCOLLECTOR_VERSION="0.35.0" --build-arg PDNSSOC_CLI_VERSION="v0.0.2"
 ```
 
 
