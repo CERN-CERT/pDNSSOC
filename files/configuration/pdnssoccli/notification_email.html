@@ -45,35 +45,35 @@
                     <th>Comment</th>
                     <th>Tags</th>
                 </tr>
-                <% all_results.each do |ioc, data_ioc| %>
+                {% for alert in alerts %}
                     <tr>
-                        <% if data_ioc["client_name"] == "" %>
-                            <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><%= data_ioc["client_ip"] %></td>
-                        <% else %>
-                            <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><%= data_ioc["client_name"] %> (<%= data_ioc["client_ip"] %>)</td>
-                        <% end %>
-                        <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><%= Time.at(data_ioc["first_occurrence"]).strftime(TIME_FORMAT_YMD) %></td>
-                        <td style="text-align: left;" rowspan="<%= data_ioc["misp"].length %>"><a href="" target="_new"><%= data_ioc["ioc_detected"] %></a></td>
-                        <% data_ioc["misp"].each_with_index do |misp_event, idx_event| %>
-                            <% if idx_event > 0 %>
-                                <tr>
-                            <% end %>
-                            <td style="text-align: left;"><a href="https://<%= misp_event["misp_server"] %>/events/view/<%= misp_event["misp_id"] %>" target="_new"><%= misp_event["misp_info"] %></a></td>
-                            <td style="text-align: left;"><%=  misp_event["num_iocs"] %></td>
-                            <td style="text-align: left;"><%=  misp_event["publication"] %></td>
-                            <td style="text-align: left;"><%=  misp_event["organisation"] %></td>
-                            <td style="text-align: left;"><%=  misp_event["comment"] %></td>
+                    {% if alert["client_name"] == "" %}
+                        <td style="text-align: left;" rowspan="{{ (alert["correlation"]["misp"]["events"] | length) +1 }}">{{ alert["client_ip"] }}</td>
+                    {% else %}
+                        <td style="text-align: left;" rowspan="{{ (alert["correlation"]["misp"]["events"] | length) +1 }}">{{ alert["client_name"] }} ({{ alert["client_ip"] }})</td>
+                    {% endif %}
+                        <td style="text-align: left;" rowspan="{{  (alert["correlation"]["misp"]["events"] | length) +1 }}">{{ alert.timestamp | datetime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td style="text-align: left;" rowspan="{{  (alert["correlation"]["misp"]["events"] | length) +1 }}"><a href="" target="_new">{{ alert["query"] }}</a></td>
+                    {%  for idx_event, event in alert["correlation"]["misp"]["events"] | enumerate %}
+                    {% if idx_event > 0 %}
+                        <tr>
+                    {% endif %}
+                            <td style="text-align: left;"><a href="https://{{ event["server"] }}/events/view/{{ event["id"] }}" target="_new">{{ event["info"] }}</a></td>
+                            <td style="text-align: left;">{{  event["num_iocs"] }}</td>
+                            <td style="text-align: left;">{{  event["publication"] }}</td>
+                            <td style="text-align: left;">{{  event["organization"] }}</td>
+                            <td style="text-align: left;">{{  event["comment"] }}</td>
                             <td style="text-align: left;">
-                                <% for tag in misp_event["tags"] do %>
-                                    <span style="background: <%= tag["colour"] %>;">
-                                        <b><span style="color: #fff; mix-blend-mode: difference; padding: 5px;"><%= tag["name"] %></span></b>
-                                    </span>
-                                <% end %>
+                            {% for tag in event["tags"]%}
+                                <span style="background: {{ tag["colour"] }};">
+                                    <b><span style="color: #fff; mix-blend-mode: difference; padding: 5px;">{{ tag["name"] }}</span></b>
+                                </span>
+                            {% endfor %}
                             </td>
                         </tr>
-                        <% end %>
+                        {% endfor %}
                     </tr>
-                <% end %>
+                {% endfor %}
             </tbody>
         </table>
     </body>
