@@ -35,9 +35,10 @@ jobs:
 
       # Store the version, stripping any v-prefix
       - name: Write release version
+        id: extract-version
         run: |
-          TAG=${{ github.event.release.tag_name }}
-          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
+          TAG=${{ github.ref_name }}
+          echo "::set-output name=version::${TAG#v}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.0.0
@@ -47,7 +48,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/cern-cert/pdnssoc:latest
-            ghcr.io/cern-cert/pdnssoc:${VERSION}
+            ghcr.io/cern-cert/pdnssoc:${{ steps.extract-version.outputs.version }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             GO_DNSCOLLECTOR_VERSION=0.36.0
