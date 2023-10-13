@@ -2,6 +2,7 @@ FROM python:3.11-alpine
 
 ARG GO_DNSCOLLECTOR_VERSION
 ARG PDNSSOC_CLI_VERSION
+ARG PDNSSOC_CLI_PYPI_INDEX
 
 RUN apk add --no-cache --update \
     bash  \
@@ -14,9 +15,7 @@ RUN apk add --no-cache --update \
     gzip
 
 # Install pdnssoc-cli
-#RUN pip install "pdnssoc-cli==$PDNSSOC_CLI_VERSION"
-
-RUN pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pdnssoc-cli==$PDNSSOC_CLI_VERSION
+RUN pip install --index-url https://$PDNSSOC_CLI_PYPI_INDEX/simple --extra-index-url https://pypi.org/simple pdnssoc-cli==$PDNSSOC_CLI_VERSION
 
 RUN mkdir /build
 

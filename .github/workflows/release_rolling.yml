@@ -42,5 +42,6 @@ jobs:
             ghcr.io/cern-cert/pdnssoc:edge
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            GO_DNSCOLLECTOR_VERSION=0.35.0
-            PDNSSOC_CLI_VERSION=0.0.2.dev10
+            GO_DNSCOLLECTOR_VERSION=0.36.0
+            PDNSSOC_CLI_VERSION=0.0.2.dev26
+            PDNSSOC_CLI_PYPI_INDEX=test.pypi.org

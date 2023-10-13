@@ -6,7 +6,7 @@ global:
   # If turned on, log some applications messages
   trace:
     # debug informations
-    verbose: true
+    verbose: false
   # Set the server identity name
   # comment the following line to use the hostname
   server-identity: "dns-collector"
