@@ -29,6 +29,7 @@ A typical use case would be universities deploying a pDNSSOC client on their DNS
 * [:beetle: Issue tracker](../../issues)
 * [:loudspeaker: Community discussions](../../discussions)
 * [:question: Frequently asked questions](./FAQ.md)
+* [:bar_chart: Presentations](./docs/presentations.md)
 
 ## Acknowledgments
 pDNSSOC would not exist without:
