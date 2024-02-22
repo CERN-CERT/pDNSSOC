@@ -18,28 +18,28 @@ multiplexer:
         listen-ip: 0.0.0.0
         # Modify with the port set as target for the client
         listen-port: 6000
-        chan-buffer-size: 655350
+        chan-buffer-size: 65535
 
   loggers:
     - name: filelogdomains
       logfile:
-        file-path: /var/dnscollector/matches/matches_domains.json
+        file-path: "/var/dnscollector/matches/matches_domains.json"
         mode: json
       transforms:
         filtering:
-          keep-fqdn-file: '/var/dnscollector/misp_domains.txt'
+          keep-fqdn-file: "/var/dnscollector/misp_domains.txt"
 
     - name: filelogips
       logfile:
-        file-path: /var/dnscollector/matches/matches_ips.json
+        file-path: "/var/dnscollector/matches/matches_ips.json"
         mode: json
       transforms:
         filtering:
-          keep-rdata-file: '/var/dnscollector/misp_ips.txt'
+          keep-rdata-file: "/var/dnscollector/misp_ips.txt"
 
     - name: fileall
       logfile:
-        file-path: /var/dnscollector/queries.log
+        file-path: "/var/dnscollector/queries.log"
         mode: json
         max-size: 100
         max-files: 100
