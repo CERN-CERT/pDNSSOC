@@ -27,7 +27,7 @@ multiplexer:
 
   loggers:
     - name: dnstap_pdnssoc
-      dnstap:
+      dnstapclient:
         remote-address: pdnssoc_server_ip # Modify with the target pdnssoc destination
         remote-port: pdnssoc_server_port
         connect-timeout: 5
