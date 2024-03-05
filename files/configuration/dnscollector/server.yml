@@ -4,7 +4,7 @@
 ################################################
 global:
   trace:
-    verbose: fase
+    verbose: false
   text-format: "timestamp-rfc3339ns identity operation rcode queryip queryport family protocol length qname qtype latency"
   # default text field delimiter
   text-format-delimiter: " "
