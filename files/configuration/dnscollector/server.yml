@@ -18,7 +18,7 @@ multiplexer:
         listen-ip: 0.0.0.0
         # Modify with the port set as target for the client
         listen-port: 6000
-        chan-buffer-size: 65535
+        chan-buffer-size: 655350
 
   loggers:
     - name: filelogdomains
