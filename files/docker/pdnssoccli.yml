@@ -3,7 +3,7 @@ logging_level: "INFO"
 misp_servers:
   - domain: "https://example-misp-instance.com"
     api_key: "API_KEY"
-    verify_ssl: false
+    verify_ssl: False
     # misp.search() arguments
     args:
       enforce_warninglist: True
