@@ -1,5 +1,12 @@
 # Presentations
 
+## 2024
+
+* pDNSSOC: Correlating DNS logs with threat intel from MISP as a poor man’s SOC.
+    * Panagiotis Matamis
+    * 2024 GÉANT Security Days - Prague, Czech Republic
+    * [Slides](./presentations/2024/pdnssoc_presented_by_deic.pdf)
+
 ## 2023
 
 * pDNSSOC: Correlating DNS logs with threat intel from MISP as a poor man’s SOC.
