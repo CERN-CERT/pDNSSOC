@@ -3,6 +3,7 @@ logging_level: "INFO"
 misp_servers:
   - domain: "https://example-misp-instance.com"
     api_key: "API_KEY"
+    verify_ssl: True
     # misp.search() arguments
     args:
       enforce_warninglist: True
@@ -16,13 +17,13 @@ misp_servers:
         delta: False
 
 correlation:
-  input_dir: ./input_dir/ # use this if no files are defined from commmand line
-  output_dir: ./output_dir/
-  archive_dir: ./archive/ # use this as input for looking back
-  malicious_domains_file: ./misp_domains.txt
-  malicious_ips_file: ./misp_ips.txt
-  last_correlation_pointer_file: ./correlation.last
-  last_retro_pointer_file: ./retro.last
+  input_dir: /var/dnscollector/queries # use this if no files are defined from commmand line
+  output_dir: /var/dnscollector/alerts
+  archive_dir: /var/dnscollector/archive # use this as input for looking back
+  malicious_domains_file: /var/dnscollector/misp_domains.txt
+  malicious_ips_file: /var/dnscollector/misp_ips.txt
+  last_correlation_pointer_file: /var/dnscollector/correlation.last
+  last_retro_pointer_file: /var/dnscollector/retro.last
 
 schedules:
   fetch_iocs:
@@ -42,7 +43,7 @@ alerting:
     summary_to: "pdnssoc-dev@cern.ch"
     server: "localhost"
     port: 25
-    template: ./alert_email_template.html
+    template: /etc/pdnssoccli/alert_email.html
     mappings:
       - client_id: client_1
         contact: client_1_sec_team@domain.tld
