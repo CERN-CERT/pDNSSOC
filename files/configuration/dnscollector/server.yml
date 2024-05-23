@@ -40,7 +40,7 @@ multiplexer:
 
     - name: fileall
       logfile:
-        file-path: "/var/dnscollector/queries.log"
+        file-path: "/var/dnscollector/queries.json"
         mode: json
         max-size: 100
         max-files: 100
