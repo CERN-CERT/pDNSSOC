@@ -29,7 +29,7 @@ multiplexer:
     - name: dnstap_pdnssoc
       dnstapclient:
         remote-address: pdnssoc_server_ip # Modify with the target pdnssoc destination
-        remote-port: pdnssoc_server_port
+        remote-port: pdnssoc_server_port # Modify accordingly i.e. 7001
         connect-timeout: 5
         retry-interval: 10
         flush-interval: 10
