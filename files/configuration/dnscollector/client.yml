@@ -35,7 +35,7 @@ multiplexer:
         flush-interval: 10
         tls-support: false
         tls-insecure: false
-        server-id: "SERVER_ID"
+        server-id: "ID_PDNSSOC"
         buffer-size: 100
         chan-buffer-size: 65535
 
