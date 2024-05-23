@@ -5,6 +5,7 @@
 global:
   trace:
     verbose: false
+  server-identity: "ID_PDNSSOC"
   text-format: "timestamp-rfc3339ns identity operation rcode queryip queryport family protocol length qname qtype latency"
   # default text field delimiter
   text-format-delimiter: " "
@@ -17,7 +18,7 @@ multiplexer:
       dnstap:
         listen-ip: 0.0.0.0
         # Modify with the port set as target for the client
-        listen-port: 6000
+        listen-port: 7001
         chan-buffer-size: 655350
 
   loggers:
