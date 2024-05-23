@@ -17,7 +17,7 @@ misp_servers:
         delta: False
 
 correlation:
-  input_dir: /var/dnscollector/queries # use this if no files are defined from commmand line
+  input_dir: /var/dnscollector/matches # use this if no files are defined from commmand line
   output_dir: /var/dnscollector/alerts
   archive_dir: /var/dnscollector/archive # use this as input for looking back
   malicious_domains_file: /var/dnscollector/misp_domains.txt
@@ -36,7 +36,7 @@ schedules:
     interval: 60 # minutes
 
 alerting:
-  last_alerting_pointer_file: ./tests/alert.last
+  last_alerting_pointer_file: /var/dnscollector/alert.last
   email:
     from: "pdnssoc-dev@domain.tld"
     subject: "[pDNSSOC] Community XYZ alert"
