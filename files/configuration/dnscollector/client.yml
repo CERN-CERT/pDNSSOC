@@ -40,9 +40,7 @@ multiplexer:
         chan-buffer-size: 65535
 
   routes:
-    - from:
-        - sniff # enable if sniffing with AF_PACKET
+    - from: [ sniff ] # enable if sniffing with AF_PACKET
         # Enable if using dnstap
         #- dnstap_socket
-      to:
-        - dnstap_pdnssoc
+      to: [ dnstap_pdnssoc ]
