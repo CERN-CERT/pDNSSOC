@@ -7,14 +7,14 @@ misp_servers:
     # misp.search() arguments
     args:
       enforce_warninglist: True
-    periods:
-      generic:
-        delta:
-          days: 30
-      tags:
-      - names:
-          - "tag_name"
-        delta: False
+#   periods:
+#     generic:
+#       delta:
+#         days: 30    # CAREFUL - IOCs older than the days specified will be ignored. 
+#     tags:
+#     - names:
+#         - "tag_name"
+#       delta: False  
 
 correlation:
   input_dir: /var/dnscollector/matches # use this if no files are defined from commmand line
@@ -37,13 +37,13 @@ schedules:
 
 alerting:
   last_alerting_pointer_file: /var/dnscollector/alert.last
-  email:
-    from: "pdnssoc-dev@domain.tld"
-    subject: "[pDNSSOC] Community XYZ alert"
-    summary_to: "pdnssoc-dev@cern.ch"
-    server: "localhost"
-    port: 25
-    template: /etc/pdnssoccli/alert_email.html
-    mappings:
-      - client_id: client_1
-        contact: client_1_sec_team@domain.tld
+# email:
+#   from: "pdnssoc-dev@domain.tld"
+#   subject: "[pDNSSOC] Community XYZ alert"
+#   summary_to: "pdnssoc-dev@cern.ch"
+#   server: "localhost"
+#   port: 25
+#   template: /etc/pdnssoccli/alert_email.html
+#   mappings:
+#     - client_id: client_1
+#       contact: client_1_sec_team@domain.tld
