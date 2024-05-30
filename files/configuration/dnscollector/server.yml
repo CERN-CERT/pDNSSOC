@@ -44,7 +44,7 @@ multiplexer:
         mode: json
         max-size: 100
         max-files: 100
-        postrotate-command: "/var/dnscollector/postrotate_query.sh"
+        postrotate-command: "/var/pdnssoccli/postrotate_query.sh"
         postrotate-delete-success: true
 
   routes:
