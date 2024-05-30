@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/go-dnscollector -config /etc/dnscollector/config.yml
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -SIGHUP $MAINPID
 KillMode=process
 Restart=on-failure
 User=dnscollector
