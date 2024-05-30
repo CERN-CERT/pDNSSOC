@@ -1,5 +1,5 @@
+---
 logging_level: "INFO"
-
 misp_servers:
   - domain: "https://example-misp-instance.com"
     api_key: "API_KEY"
@@ -7,24 +7,22 @@ misp_servers:
     # misp.search() arguments
     args:
       enforce_warninglist: True
-#   periods:
-#     generic:
-#       delta:
-#         days: 30    # CAREFUL - IOCs older than the days specified will be ignored. 
-#     tags:
-#     - names:
-#         - "tag_name"
-#       delta: False  
-
+    periods:
+      generic:
+        delta:
+          days: 30
+      tags:
+      - names:
+          - "tag_name"
+        delta: False 
 correlation:
-  input_dir: /var/dnscollector/matches # use this if no files are defined from commmand line
+  input_dir: /var/dnscollector/matches 
   output_dir: /var/dnscollector/alerts
   archive_dir: /var/dnscollector/archive # use this as input for looking back
   malicious_domains_file: /var/dnscollector/misp_domains.txt
   malicious_ips_file: /var/dnscollector/misp_ips.txt
   last_correlation_pointer_file: /var/dnscollector/correlation.last
   last_retro_pointer_file: /var/dnscollector/retro.last
-
 schedules:
   fetch_iocs:
     interval: 10 # minutes
@@ -34,7 +32,6 @@ schedules:
     interval: 1440 # minutes
   alerting:
     interval: 60 # minutes
-
 alerting:
   last_alerting_pointer_file: /var/dnscollector/alert.last
 # email:
