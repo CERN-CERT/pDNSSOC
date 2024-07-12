@@ -25,7 +25,7 @@ The goal is to identify signs of infection on the clients making the DNS request
 A typical use case would be universities deploying a pDNSSOC client on their DNS server, and sending DNS data to a pDNSSOC server operated by a central CSIRT (NREN, campus, etc.).
 
 ## Getting started
-* [:bookmark_tabs: Project documentation](../../wiki)
+* [:bookmark_tabs: Installation guide](../../wiki)
 * [:beetle: Issue tracker](../../issues)
 * [:loudspeaker: Community discussions](../../discussions)
 * [:question: Frequently asked questions](./FAQ.md)
@@ -33,6 +33,7 @@ A typical use case would be universities deploying a pDNSSOC client on their DNS
 
 ## Acknowledgments
 pDNSSOC would not exist without:
+* Its contributors and the support from their funding agencies
 * [go-dnscollector](https://github.com/dmachard/go-dnscollector)
 * [MISP](https://github.com/MISP/MISP/)
 
