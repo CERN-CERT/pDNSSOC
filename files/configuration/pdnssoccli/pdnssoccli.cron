@@ -1,0 +1,8 @@
+# Run fetch_iocs every 10 minutes
+*/10 * * * * dnscollector /usr/local/bin/pdnssoc-cli fetch-iocs -c /etc/pdnssoccli/pdnssoccli.yml
+
+# Run correlation every 1 minute
+* * * * * dnscollector /usr/local/bin/pdnssoc-cli correlate -c /etc/pdnssoccli/pdnssoccli.yml
+
+# Run alerting every 1 minute
+* * * * * dnscollector /usr/local/bin/pdnssoc-cli alert -c /etc/pdnssoccli/pdnssoccli.yml
