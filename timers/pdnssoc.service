@@ -1,6 +1,0 @@
-[Unit]
-Description=Run pdnssoc.rb every 15 minutes
-
-[Service]
-ExecStart=/opt/td-agent/bin/ruby /usr/local/bin/pdnssoc/pdnssoc.rb
-User=root

@@ -1,6 +1,0 @@
-[Unit]
-Description=Run lookingback.sh every day at 12:00
-
-[Service]
-ExecStart=/bin/bash /usr/local/bin/pdnssoc/lookingback.sh
-User=root
