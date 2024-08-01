@@ -1,52 +1,54 @@
-
 ################################################
 # Collector configuration
 ################################################
 global:
+  pid-file: "/var/dnscollector/collector.pid"
   trace:
     verbose: false
-  server-identity: "ID_PDNSSOC"
-  text-format: "timestamp-rfc3339ns identity operation rcode queryip queryport family protocol length qname qtype latency"
+  server-identity: "pDNSSOC_SERVER"
+  text-format: "timestamp-rfc3339ns qr identity operation rcode queryip queryport protocol qname qtype name"
   # default text field delimiter
   text-format-delimiter: " "
   # default text field boundary
   text-format-boundary: "\""
 
-multiplexer:
-  collectors:
-    - name: dnstap
-      dnstap:
-        listen-ip: 0.0.0.0
-        # Modify with the port set as target for the client
-        listen-port: 7001
-        chan-buffer-size: 655350
 
-  loggers:
-    - name: filelogdomains
-      logfile:
-        file-path: "/var/dnscollector/matches/matches_domains.json"
-        mode: json
-      transforms:
-        filtering:
-          keep-fqdn-file: "/var/dnscollector/misp_domains.txt"
+pipelines:
+ - name: dnstap
+   dnstap:
+    listen-ip: 0.0.0.0
+    listen-port: 7001
+    chan-buffer-size: 655350
+   transforms:
+     filtering:
+        log-queries: false
+        log-replies: true
+   routing-policy:
+        forward: [ filelogdomains, filelogips, fileall ]     
 
-    - name: filelogips
-      logfile:
-        file-path: "/var/dnscollector/matches/matches_ips.json"
-        mode: json
-      transforms:
-        filtering:
-          keep-rdata-file: "/var/dnscollector/misp_ips.txt"
+ - name: filelogdomains
+   logfile:
+    file-path: /var/dnscollector/matches/matches_domains.json
+    mode: json
+   transforms:
+     filtering:
+      keep-fqdn-file: '/var/dnscollector/misp_domains.txt'
 
-    - name: fileall
-      logfile:
-        file-path: "/var/dnscollector/queries.json"
+ - name: filelogips
+   logfile:
+        file-path: /var/dnscollector/matches/matches_ips.json
         mode: json
-        max-size: 100
-        max-files: 100
-        postrotate-command: "/var/pdnssoccli/postrotate_query.sh"
+   transforms:
+     filtering:
+      keep-rdata-file: '/var/dnscollector/misp_ips.txt'
+
+ - name: fileall
+   logfile:
+        file-path: /var/dnscollector/queries/queries.json
+        mode: json
+        flush-interval: 1
+        # Tune the size and number of files used for retro searches here:
+        max-size: 200
+        max-files: 5
+        chan-buffer-size: 65535
         postrotate-delete-success: true
-
-  routes:
-    - from: [ dnstap ]
-      to: [ filelogdomains, filelogips, fileall ]
