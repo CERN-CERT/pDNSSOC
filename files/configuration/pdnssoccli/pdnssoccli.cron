@@ -1,3 +1,6 @@
+LANG=nb_NO.UTF-8
+LC_ALL=nb_NO.UTF-8
+
 # Run fetch_iocs every 1 minute
 * * * * * root (pdnssoc-cli fetch-iocs && /bin/kill -SIGHUP $(cat /var/dnscollector/collector.pid)) >> /var/log/pdnssoc-cli-fetch-iocs.log 2>&1
 
