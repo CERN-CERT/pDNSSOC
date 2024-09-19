@@ -1,0 +1,15 @@
+[Unit]
+Description=Go DNS Collector Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/go-dnscollector -config /etc/dnscollector/config.yml
+ExecReload=/bin/kill -SIGHUP $MAINPID
+KillMode=process
+Restart=on-failure
+User=dnscollector
+Group=dnscollector
+WorkingDirectory=/etc/dnscollector
+
+[Install]
+WantedBy=multi-user.target

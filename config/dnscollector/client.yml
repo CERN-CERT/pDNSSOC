@@ -1,0 +1,46 @@
+################################################
+# Collector configuration
+################################################
+global:
+  trace:
+    verbose: false
+  # Modify with your server ID provided by your destination pDNSSOC server
+  server-identity: "SERVER_ID"
+
+  text-format: "timestamp-rfc3339ns identity operation rcode queryip queryport family protocol length qname qtype latency"
+  # default text field delimiter
+  text-format-delimiter: " "
+  # default text field boundary
+  text-format-boundary: "\""
+
+multiplexer:
+  collectors:
+    - name: sniff
+      afpacket-sniffer:
+        device: eth0 # modify with the appropriate interface
+        port: 53 # modify with the appropriate port
+        chan-buffer-size: 65535
+      transforms:
+        filtering:
+          log-queries: false
+          log-replies: true
+
+  loggers:
+    - name: dnstap_pdnssoc
+      dnstapclient:
+        remote-address: pdnssoc_server_ip # Modify with the target pdnssoc destination
+        remote-port: pdnssoc_server_port # Modify accordingly i.e. 7001
+        connect-timeout: 5
+        retry-interval: 10
+        flush-interval: 10
+        tls-support: false
+        tls-insecure: false
+        server-id: "ID_PDNSSOC"
+        buffer-size: 100
+        chan-buffer-size: 65535
+
+  routes:
+    - from: [ sniff ] # enable if sniffing with AF_PACKET
+        # Enable if using dnstap
+        #- dnstap_socket
+      to: [ dnstap_pdnssoc ]

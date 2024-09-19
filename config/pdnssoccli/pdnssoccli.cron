@@ -1,0 +1,12 @@
+LANG=nb_NO.UTF-8
+LC_ALL=nb_NO.UTF-8
+
+# Run fetch_iocs every hour
+0 */1 * * * root (pdnssoc-cli fetch-iocs && /bin/kill -SIGHUP $(cat /var/dnscollector/collector.pid)) >> /var/log/pdnssoc-cli-fetch-iocs.log 2>&1
+
+# Run correlation & alert every 15min
+*/15 * * * * root pdnssoc-cli correlate  /var/dnscollector/matches >> /var/log/pdnssoc-cli-correlate.log 2>&1 &&  pdnssoc-cli alert /var/dnscollector/alerts/ >> /var/log/pdnssoc-cli-alert.log 2>&1
+
+# Retro-active searches every hour, if the system is not overloaded
+0 */1 * * * root ([ $(awk '{print $1}' /proc/loadavg) \< 0.5 ] && pdnssoc-cli  correlate --retro_disco_lookup /var/dnscollector/queries/) >> /var/log/pdnssoc-cli-retro.log  2>&1
+
