@@ -14,7 +14,7 @@ _A: Yes, pDNSSOC will combine the intel from several MISP instances and allow fo
 
 Q: An external team has their own "private" MISP instance and pDNSSOC deployment. How could we benefit from it without breaching TLP or privacy?
 
-_A: pDNSSOC can send incoming DNS data to be reprocessed by another pDNSSOC instance operated by a different team.
+_A: pDNSSOC can send incoming DNS data to be reprocessed by another pDNSSOC instance operated by a different team._
 
 **Privacy**: DNS collection can be configured to hide the client IP and use either the DNS server IP or the pDNSSOC instance IP instead. As a result, the client IP or originating DNS server is not exposed to the external team.
 
