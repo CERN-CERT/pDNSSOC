@@ -10,7 +10,7 @@
 ## 2023
 
 * pDNSSOC: Correlating DNS logs with threat intel from MISP as a poor man’s SOC.
-    * Christos Arvanitis, Pau Cutrina Vilalta, Romain Wartel
+    * Christos Arvanitis, Pau CV, Romain Wartel
     * 2023 NSF Cybersecurity Summit - Lawrence Berkeley National Laboratory|Berkeley, CA
     * [Slides](./presentations/2023/pDNSSOC_NSF_2023.pdf)
 
